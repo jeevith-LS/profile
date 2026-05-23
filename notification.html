@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadLens - Notifications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-light: #e0f2fe;
+            --primary-dark: #0369a1;
+            --secondary: #3b82f6;
+            --bg-color: #f5f7fb;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --border-color: #cbd5e1;
+            --border-glass: rgba(255, 255, 255, 0.5);
+            
+            /* Status Colors */
+            --yellow: #f59e0b;
+            --green: #10b981;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+            --shadow-hover: 0 12px 40px 0 rgba(14, 165, 233, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f9ff;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%230ea5e9' fill-opacity='0.15'/%3E%3C/svg%3E"),
+                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 60%),
+                radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(52, 211, 153, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(129, 140, 248, 0.12) 0px, transparent 50%);
+            background-size: 40px 40px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            animation: bgFloat 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgFloat {
+            0% { background-position: 0 0, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+            100% { background-position: 20px 20px, 5% 5%, -5% 5%, 5% -5%, -5% -5%; }
+        }
+
+        /* Abstract glowing blobs via pseudo-elements */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -2;
+            pointer-events: none;
+            animation: blobFloat 20s infinite alternate ease-in-out;
+        }
+
+        body::before {
+            width: 60vw;
+            height: 60vw;
+            background: rgba(56, 189, 248, 0.12);
+            top: -20vh;
+            left: -10vw;
+        }
+
+        body::after {
+            width: 70vw;
+            height: 70vw;
+            background: rgba(14, 165, 233, 0.08);
+            bottom: -20vh;
+            right: -10vw;
+            animation-delay: -10s;
+        }
+
+        @keyframes blobFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5vw, 5vh) scale(1.1); }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Glassmorphism floating shapes in background */
+        .main-content::before, .main-content::after {
+            content: '';
+            position: fixed;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: -1;
+            pointer-events: none;
+            animation: shapeFloat 25s infinite alternate ease-in-out;
+        }
+
+        .main-content::before {
+            width: 350px;
+            height: 350px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%);
+            top: 15%;
+            left: -150px;
+            transform: rotate(45deg);
+        }
+
+        .main-content::after {
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -12.5s;
+        }
+
+        @keyframes shapeFloat {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            100% { transform: translateY(-80px) rotate(20deg) scale(1.05); }
+        }
+
+        /* Top Header */
+        .header {
+            background-color: #ffffff;
+            padding: 1.25rem 2.5rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .horizontal-tabs {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .tab {
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            padding-bottom: 0.5rem;
+            position: relative;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1.25rem;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .timestamp {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .timestamp::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Profile Dropdown Menu */
+        .profile-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 250px;
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            padding: 8px 0;
+            animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top right;
+        }
+
+        .profile-dropdown.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+        }
+
+        .dropdown-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid var(--border-color);
+        }
+
+        .dropdown-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dropdown-user-info .user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .dropdown-user-info .user-role {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .dropdown-divider {
+            height: 1.5px;
+            background-color: var(--border-color);
+            margin: 6px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .dropdown-item .dropdown-icon {
+            font-size: 16px;
+        }
+
+        .dropdown-item.logout-item {
+            color: var(--danger);
+        }
+
+        .dropdown-item.logout-item:hover {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* Container */
+        .container {
+            padding: 2.5rem;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Container shadow for deep glow depth */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 2rem; left: 2rem; right: 2rem; bottom: 2rem;
+            background: transparent;
+            box-shadow: 0 0 120px 30px rgba(14, 165, 233, 0.06);
+            border-radius: 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .page-title {
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-align: center;
+            letter-spacing: 0.05em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        /* Filter Section Styles */
+        .filter-container {
+            position: relative;
+            margin-bottom: 2.5rem;
+            z-index: 10;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            padding: 0.75rem 2.25rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.15);
+            background: #ffffff;
+        }
+
+        .filter-btn .arrow {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .filter-btn.active .arrow {
+            transform: rotate(180deg);
+        }
+
+        .filter-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15), 0 8px 12px -6px rgba(0,0,0,0.08);
+            padding: 12px 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .filter-menu-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 8px 18px 4px 18px;
+        }
+
+        .filter-item {
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .filter-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .filter-item.active::after {
+            content: '✓';
+            font-weight: 700;
+        }
+
+        .filter-divider {
+            height: 1.5px;
+            background-color: rgba(203, 213, 225, 0.5);
+            margin: 6px 0;
+        }
+
+        /* Notifications Stack */
+        .notifications-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Notification Card Styles */
+        .notification-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            min-height: 145px;
+            position: relative;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .notification-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(14, 165, 233, 0.35);
+        }
+
+        /* Card Top Left: Status */
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Pulsing Glow Light effect */
+        .status-dot::after {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: lightPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes lightPulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+
+        /* Status Colors */
+        /* Yellow = In Progress */
+        .status-in-progress {
+            background-color: var(--yellow);
+            box-shadow: 0 0 8px var(--yellow);
+        }
+        .status-in-progress::after {
+            background-color: var(--yellow);
+        }
+        .status-text-in-progress {
+            color: #d97706;
+            font-weight: 700;
+        }
+
+        /* Green = Completed */
+        .status-completed {
+            background-color: var(--green);
+            box-shadow: 0 0 8px var(--green);
+        }
+        .status-completed::after {
+            background-color: var(--green);
+        }
+        .status-text-completed {
+            color: #059669;
+            font-weight: 700;
+        }
+
+        /* Red = Failed */
+        .status-failed {
+            background-color: var(--red);
+            box-shadow: 0 0 8px var(--red);
+        }
+        .status-failed::after {
+            background-color: var(--red);
+        }
+        .status-text-failed {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        /* Blue = Complaint Sent */
+        .status-complaint-sent {
+            background-color: var(--blue);
+            box-shadow: 0 0 8px var(--blue);
+        }
+        .status-complaint-sent::after {
+            background-color: var(--blue);
+        }
+        .status-text-complaint-sent {
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* Card Content Details */
+        .card-body {
+            flex: 1;
+            margin-bottom: 1.5rem;
+            padding-right: 120px; /* Space for bottom right section to avoid overlaps */
+        }
+
+        .message-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        /* Card Bottom Right details (fixed position) */
+        .card-footer-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .card-footer-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .date-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .read-more-btn {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            outline: none;
+        }
+
+        .read-more-btn:hover {
+            color: var(--primary-dark);
+            transform: translateX(3px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 2px dashed var(--border-color);
+            text-align: center;
+            width: 100%;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        .empty-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal Overlay & Card Details Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInOverlay 0.25s ease-out;
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .details-modal {
+            background-color: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            max-width: 550px;
+            width: 100%;
+            padding: 2.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .details-modal.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--text-main);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1.5px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .modal-content-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: baseline;
+        }
+
+        .modal-label {
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            min-width: 110px;
+        }
+
+        .modal-val {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid var(--border-color);
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .modal-btn:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+        }
+
+        /* Modal Alerts overlay */
+        .modal-overlay-logout {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            animation: fadeInOverlay 0.2s ease-out;
+        }
+
+        .modal-overlay-logout.show {
+            display: block;
+        }
+
+        .logout-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 90%;
+            max-width: 400px;
+            background-color: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            z-index: 2001;
+            display: none;
+            padding: 32px 24px;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.2s ease-out;
+        }
+
+        .logout-modal.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .logout-warning-icon {
+            font-size: 44px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .logout-modal h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .logout-modal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .logout-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn-logout {
+            padding: 10px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-cancel {
+            background-color: #ffffff;
+            color: var(--text-secondary);
+        }
+
+        .btn-cancel:hover {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border-color: #cbd5e1;
+        }
+
+        .btn-logout {
+            background-color: var(--danger);
+            color: #ffffff;
+            border-color: var(--danger);
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        /* Responsiveness adjustments */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem 1.5rem;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            .page-title {
+                font-size: 2rem;
+                margin-bottom: 1.5rem;
+            }
+            .card-body {
+                padding-right: 0;
+            }
+            .filter-container {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <div class="horizontal-tabs">
+                <a href="profile.html" class="tab">Account Center</a>
+                <a href="settings.html" class="tab">Safety & Privacy</a>
+                <a href="notification.html" class="tab active">Notifications</a>
+            </div>
+            <div class="header-actions" style="position: relative;">
+                <div class="timestamp">
+                    Data last updated: <span id="current-time">Today, 14:30 PM</span>
+                </div>
+                <div id="profile-dropdown-trigger" style="width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer;">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=0ea5e9&color=fff&bold=true" alt="User Profile" id="top-bar-avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+
+                <!-- PROFILE DROPDOWN MENU -->
+                <div id="profile-dropdown" class="profile-dropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-avatar">AU</div>
+                        <div class="dropdown-user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">System Administrator</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="profile.html" class="dropdown-item">
+                        <span class="dropdown-icon">👤</span>
+                        <span>Profile Information</span>
+                    </a>
+                    <a href="settings.html" class="dropdown-item">
+                        <span class="dropdown-icon">⚙️</span>
+                        <span>Safety & Privacy</span>
+                    </a>
+                    <a href="notification.html" class="dropdown-item">
+                        <span class="dropdown-icon">🔔</span>
+                        <span>Notifications</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="logout-trigger" class="dropdown-item logout-item">
+                        <span class="dropdown-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <h1 class="page-title">NOTIFICATION</h1>
+
+            <!-- Filter Section -->
+            <div class="filter-container">
+                <button class="filter-btn" id="filter-btn-trigger">
+                    <span>🔍 Filter Options</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="filter-dropdown-menu" id="filter-dropdown-menu">
+                    <div class="filter-menu-title">Filter by Status</div>
+                    <div class="filter-item active" data-type="status" data-value="all">All Notifications</div>
+                    <div class="filter-item" data-type="status" data-value="complaint-sent">Complaint Sent</div>
+                    <div class="filter-item" data-type="status" data-value="failed">Failed to Send</div>
+                    <div class="filter-item" data-type="status" data-value="in-progress">In Progress</div>
+                    <div class="filter-item" data-type="status" data-value="completed">Completed</div>
+                    
+                    <div class="filter-divider"></div>
+                    
+                    <div class="filter-menu-title">Sort by Date</div>
+                    <div class="filter-item" data-type="sort" data-value="newest">Newest First</div>
+                    <div class="filter-item" data-type="sort" data-value="oldest">Oldest First</div>
+                    
+                    <div class="filter-divider"></div>
+                    
+                    <div class="filter-menu-title">Filter by Problem</div>
+                    <div class="filter-item" data-type="problem" data-value="all">All Problems</div>
+                    <div class="filter-item" data-type="problem" data-value="pothole">Potholes</div>
+                    <div class="filter-item" data-type="problem" data-value="crack">Road Cracks</div>
+                    <div class="filter-item" data-type="problem" data-value="water-leakage">Water Leakage</div>
+                </div>
+            </div>
+
+            <!-- Notifications Stack -->
+            <div class="notifications-stack" id="notifications-stack">
+                
+                <!-- Card 1: In Progress -->
+                <div class="notification-card" data-id="1" data-status="in-progress" data-problem="pothole" data-timestamp="1779532562000" data-date="23/05/2026">
+                    <div class="card-top">
+                        <div class="status-badge">
+                            <span class="status-dot status-in-progress"></span>
+                            <span class="status-label status-text-in-progress">In Progress</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="message-text">Pothole complaint is currently under review.</p>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="card-footer-right">
+                            <span class="date-text">23/05/2026</span>
+                            <button class="read-more-btn" onclick="openDetails(1)">Read More →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Completed -->
+                <div class="notification-card" data-id="2" data-status="completed" data-problem="crack" data-timestamp="1753362000000" data-date="25/07/2025">
+                    <div class="card-top">
+                        <div class="status-badge">
+                            <span class="status-dot status-completed"></span>
+                            <span class="status-label status-text-completed">Completed</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="message-text">Road crack issue successfully repaired.</p>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="card-footer-right">
+                            <span class="date-text">25/07/2025</span>
+                            <button class="read-more-btn" onclick="openDetails(2)">Read More →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Failed -->
+                <div class="notification-card" data-id="3" data-status="failed" data-problem="water-leakage" data-timestamp="1753448400000" data-date="26/07/2025">
+                    <div class="card-top">
+                        <div class="status-badge">
+                            <span class="status-dot status-failed"></span>
+                            <span class="status-label status-text-failed">Failed</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="message-text">Water leakage complaint failed to process.</p>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="card-footer-right">
+                            <span class="date-text">26/07/2025</span>
+                            <button class="read-more-btn" onclick="openDetails(3)">Read More →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Complaint Sent -->
+                <div class="notification-card" data-id="4" data-status="complaint-sent" data-problem="pothole" data-timestamp="1779435600000" data-date="22/05/2026">
+                    <div class="card-top">
+                        <div class="status-badge">
+                            <span class="status-dot status-complaint-sent"></span>
+                            <span class="status-label status-text-complaint-sent">Complaint Sent</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="message-text">New pothole report on GST Road has been successfully submitted to municipal council.</p>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="card-footer-right">
+                            <span class="date-text">22/05/2026</span>
+                            <button class="read-more-btn" onclick="openDetails(4)">Read More →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: Complaint Sent -->
+                <div class="notification-card" data-id="5" data-status="complaint-sent" data-problem="water-leakage" data-timestamp="1779262800000" data-date="20/05/2026">
+                    <div class="card-top">
+                        <div class="status-badge">
+                            <span class="status-dot status-complaint-sent"></span>
+                            <span class="status-label status-text-complaint-sent">Complaint Sent</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="message-text">Water leakage report at Velachery Junction sent to METRO Water Supply board.</p>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="card-footer-right">
+                            <span class="date-text">20/05/2026</span>
+                            <button class="read-more-btn" onclick="openDetails(5)">Read More →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6: In Progress -->
+                <div class="notification-card" data-id="6" data-status="in-progress" data-problem="crack" data-timestamp="1779176400000" data-date="19/05/2026">
+                    <div class="card-top">
+                        <div class="status-badge">
+                            <span class="status-dot status-in-progress"></span>
+                            <span class="status-label status-text-in-progress">In Progress</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="message-text">Road crack repair work is actively under progress near OMR bypass road.</p>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="card-footer-right">
+                            <span class="date-text">19/05/2026</span>
+                            <button class="read-more-btn" onclick="openDetails(6)">Read More →</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Empty State element -->
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon">🔔</div>
+                <div class="empty-text">No notifications found matching your selection.</div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Details Modal Popup -->
+    <div class="modal-overlay" id="details-modal-overlay">
+        <div class="details-modal" id="details-modal">
+            <button class="modal-close" onclick="closeDetails()">&times;</button>
+            <div class="modal-header">
+                <span class="status-dot" id="modal-status-dot"></span>
+                <span class="modal-title" id="modal-title-text">Notification Details</span>
+            </div>
+            <div class="modal-content-grid">
+                <span class="modal-label">Notification ID:</span>
+                <span class="modal-val" id="modal-id">N/A</span>
+
+                <span class="modal-label">Status:</span>
+                <span class="modal-val" id="modal-status-txt" style="font-weight: 700;">N/A</span>
+
+                <span class="modal-label">Date:</span>
+                <span class="modal-val" id="modal-date">N/A</span>
+
+                <span class="modal-label">Problem Type:</span>
+                <span class="modal-val" id="modal-problem">N/A</span>
+
+                <span class="modal-label">Details:</span>
+                <span class="modal-val" id="modal-desc" style="white-space: pre-line;">N/A</span>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeDetails()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Popup -->
+    <div id="logout-modal-overlay" class="modal-overlay-logout"></div>
+    <div id="logout-modal" class="logout-modal">
+        <div class="logout-warning-icon">⚠️</div>
+        <h3>Confirm Logout</h3>
+        <p>Are you sure you want to logout of RoadLens?</p>
+        <div class="logout-modal-buttons">
+            <button id="logout-cancel-btn" class="modal-btn-logout btn-cancel">Cancel</button>
+            <button id="logout-confirm-btn" class="modal-btn-logout btn-logout">Logout</button>
+        </div>
+    </div>
+
+    <!-- Script for interactive controls -->
+    <script>
+        // Details Data mapping for "Read More" popup
+        const notificationDetails = {
+            1: {
+                id: "NOTIF-001",
+                status: "In Progress",
+                statusClass: "status-in-progress",
+                statusTxtClass: "status-text-in-progress",
+                date: "23/05/2026",
+                problem: "Pothole",
+                desc: "A pothole complaint was logged on Anna Salai Main Road. It is currently under review by the municipal public works engineers. The site inspection has been scheduled and maintenance crew will be dispatched to patch the road crack as soon as allocation is approved."
+            },
+            2: {
+                id: "NOTIF-002",
+                status: "Completed",
+                statusClass: "status-completed",
+                statusTxtClass: "status-text-completed",
+                date: "25/07/2025",
+                problem: "Road Crack",
+                desc: "The road crack issue on Guindy Flyover has been successfully resolved. Engineers and contractors resurfaced the structural joints on July 24th, 2025. Quality checks were completed, and the lane is now fully operational with safe conditions."
+            },
+            3: {
+                id: "NOTIF-003",
+                status: "Failed",
+                statusClass: "status-failed",
+                statusTxtClass: "status-text-failed",
+                date: "26/07/2025",
+                problem: "Water Leakage",
+                desc: "The water leakage complaint filed in T. Nagar has failed to process. The department noted that this area belongs to the Metro Water board instead of Chennai Highway department. The case has been marked as failed and must be resubmitted with correct jurisdiction settings."
+            },
+            4: {
+                id: "NOTIF-004",
+                status: "Complaint Sent",
+                statusClass: "status-complaint-sent",
+                statusTxtClass: "status-text-complaint-sent",
+                date: "22/05/2026",
+                problem: "Pothole",
+                desc: "The complaint regarding severe pothole development near the GST Road Metro pillar has been successfully generated and sent to the City Highway Maintenance department. The tracking ID is WH-39401. Awaiting queue processing."
+            },
+            5: {
+                id: "NOTIF-005",
+                status: "Complaint Sent",
+                statusClass: "status-complaint-sent",
+                statusTxtClass: "status-text-complaint-sent",
+                date: "20/05/2026",
+                problem: "Water Leakage",
+                desc: "The citizen feedback submission regarding water leakage at Velachery Main Junction has been dispatched to Chennai Metro Water Board. A field inspection is requested to trace and patch the cracked pipe."
+            },
+            6: {
+                id: "NOTIF-006",
+                status: "In Progress",
+                statusClass: "status-in-progress",
+                statusTxtClass: "status-text-in-progress",
+                date: "19/05/2026",
+                problem: "Road Crack",
+                desc: "The structural road cracks on OMR Bypass road are undergoing repairs. Crews have set up safety zones and are milling and filling the damaged road layers. Estimated completion: May 26th, 2026."
+            }
+        };
+
+        // Profile dropdown menu control
+        const dropdownTrigger = document.getElementById('profile-dropdown-trigger');
+        const dropdownMenu = document.getElementById('profile-dropdown');
+
+        dropdownTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', () => {
+            dropdownMenu.classList.remove('show');
+        });
+
+        // Logout Confirmation Setup
+        const logoutTrigger = document.getElementById('logout-trigger');
+        const logoutModalOverlay = document.getElementById('logout-modal-overlay');
+        const logoutModal = document.getElementById('logout-modal');
+        const logoutCancelBtn = document.getElementById('logout-cancel-btn');
+        const logoutConfirmBtn = document.getElementById('logout-confirm-btn');
+
+        if (logoutTrigger) {
+            logoutTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (logoutModalOverlay) logoutModalOverlay.classList.add('show');
+                if (logoutModal) logoutModal.classList.add('show');
+            });
+        }
+
+        const closeLogoutModal = () => {
+            if (logoutModalOverlay) logoutModalOverlay.classList.remove('show');
+            if (logoutModal) logoutModal.classList.remove('show');
+        };
+
+        if (logoutCancelBtn) {
+            logoutCancelBtn.addEventListener('click', closeLogoutModal);
+        }
+        if (logoutModalOverlay) {
+            logoutModalOverlay.addEventListener('click', closeLogoutModal);
+        }
+
+        if (logoutConfirmBtn) {
+            logoutConfirmBtn.addEventListener('click', () => {
+                logoutConfirmBtn.textContent = 'Logging out...';
+                setTimeout(() => {
+                    alert('You have successfully logged out.');
+                    closeLogoutModal();
+                }, 1000);
+            });
+        }
+
+        // Filter trigger controls
+        const filterBtnTrigger = document.getElementById('filter-btn-trigger');
+        const filterDropdownMenu = document.getElementById('filter-dropdown-menu');
+
+        filterBtnTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            filterBtnTrigger.classList.toggle('active');
+            filterDropdownMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', () => {
+            filterBtnTrigger.classList.remove('active');
+            filterDropdownMenu.classList.remove('show');
+        });
+
+        // Filtering state
+        let currentFilterStatus = 'all';
+        let currentFilterProblem = 'all';
+        let currentSortOrder = 'newest';
+
+        const filterItems = document.querySelectorAll('.filter-item');
+        const cards = Array.from(document.querySelectorAll('.notification-card'));
+        const stack = document.getElementById('notifications-stack');
+        const emptyState = document.getElementById('empty-state');
+
+        filterItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const type = item.getAttribute('data-type');
+                const value = item.getAttribute('data-value');
+
+                // Toggle active state in menu section
+                const siblings = item.parentNode.querySelectorAll(`.filter-item[data-type="${type}"]`);
+                siblings.forEach(sib => sib.classList.remove('active'));
+                item.classList.add('active');
+
+                // Update filters
+                if (type === 'status') {
+                    currentFilterStatus = value;
+                } else if (type === 'problem') {
+                    currentFilterProblem = value;
+                } else if (type === 'sort') {
+                    currentSortOrder = value;
+                }
+
+                applyFilters();
+            });
+        });
+
+        function applyFilters() {
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                const cardProblem = card.getAttribute('data-problem');
+                
+                let matchesStatus = false;
+                if (currentFilterStatus === 'all') {
+                    matchesStatus = true;
+                } else if (currentFilterStatus === 'complaint-sent' && cardStatus === 'complaint-sent') {
+                    matchesStatus = true;
+                } else if (currentFilterStatus === 'failed' && cardStatus === 'failed') {
+                    matchesStatus = true;
+                } else if (currentFilterStatus === 'in-progress' && cardStatus === 'in-progress') {
+                    matchesStatus = true;
+                } else if (currentFilterStatus === 'completed' && cardStatus === 'completed') {
+                    matchesStatus = true;
+                }
+
+                let matchesProblem = false;
+                if (currentFilterProblem === 'all') {
+                    matchesProblem = true;
+                } else if (currentFilterProblem === cardProblem) {
+                    matchesProblem = true;
+                }
+
+                if (matchesStatus && matchesProblem) {
+                    card.style.display = 'flex';
+                    card.style.animation = 'fadeIn 0.3s ease forwards';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Handle Sorting
+            const visibleCards = cards.filter(c => c.style.display !== 'none');
+            visibleCards.sort((a, b) => {
+                const timeA = parseInt(a.getAttribute('data-timestamp'));
+                const timeB = parseInt(b.getAttribute('data-timestamp'));
+                return currentSortOrder === 'newest' ? timeB - timeA : timeA - timeB;
+            });
+
+            // Re-append cards in sorted order
+            visibleCards.forEach(card => {
+                stack.appendChild(card);
+            });
+
+            // Display Empty state
+            if (visibleCount === 0) {
+                emptyState.style.display = 'flex';
+            } else {
+                emptyState.style.display = 'none';
+            }
+
+            // Update filter trigger button label
+            let label = "🔍 Filter Options";
+            if (currentFilterStatus !== 'all' || currentFilterProblem !== 'all') {
+                let parts = [];
+                if (currentFilterStatus !== 'all') {
+                    parts.push(currentFilterStatus.replace('-', ' ').toUpperCase());
+                }
+                if (currentFilterProblem !== 'all') {
+                    parts.push(currentFilterProblem.toUpperCase());
+                }
+                label = `🔍 Filtered (${parts.join(', ')})`;
+            }
+            filterBtnTrigger.querySelector('span:first-child').textContent = label;
+        }
+
+        // Details Modal logic
+        const modalOverlay = document.getElementById('details-modal-overlay');
+        const modal = document.getElementById('details-modal');
+
+        function openDetails(id) {
+            const data = notificationDetails[id];
+            if (!data) return;
+
+            // Set modal values
+            document.getElementById('modal-id').textContent = data.id;
+            document.getElementById('modal-status-txt').textContent = data.status;
+            
+            // Clear status classes on status txt
+            const statusTxt = document.getElementById('modal-status-txt');
+            statusTxt.className = 'modal-val';
+            statusTxt.classList.add(data.statusTxtClass);
+
+            // Set status dot color
+            const statusDot = document.getElementById('modal-status-dot');
+            statusDot.className = 'status-dot';
+            statusDot.classList.add(data.statusClass);
+
+            document.getElementById('modal-date').textContent = data.date;
+            document.getElementById('modal-problem').textContent = data.problem;
+            document.getElementById('modal-desc').textContent = data.desc;
+
+            // Open Modal
+            modalOverlay.classList.add('show');
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 50);
+        }
+
+        function closeDetails() {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modalOverlay.classList.remove('show');
+            }, 200);
+        }
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeDetails();
+            }
+        });
+    </script>
+</body>
+</html>

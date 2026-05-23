@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadLens - Transparency & Performance</title>
+  <!-- Imported Public Sans to match the homepage typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-main: #f4f8fb; /* Light fresh background matching the homepage */
+      --bg-topbar: #ffffff;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      
+      --accent-blue: #3b82f6; /* Homepage primary blue */
+      --accent-blue-hover: #1d4ed8;
+      --accent-blue-light: #eff6ff; /* light blue active state */
+      
+      --text-dark: #1e293b;     /* Heading colors */
+      --text-muted: #475569;    /* Secondary slate */
+      --text-light: #64748b;    /* Light grey-blue for descriptors/metadata */
+      
+      --color-green: #22c55e;
+      --color-green-light: #dcfce7;
+      
+      --border-gray: #cbd5e1;   /* Outlines */
+      --border-gray-dark: #94a3b8;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* GLOBAL TOP NAVIGATION BAR */
+    .topbar {
+      height: 70px;
+      background-color: var(--bg-topbar);
+      border-bottom: 2px solid var(--border-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text {
+      font-size: 21px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .top-tab {
+      font-size: 14px;
+      font-weight: 500;
+      color: #64748b;
+      text-decoration: none;
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      border: 2px solid var(--border-gray);
+      background-color: #ffffff;
+    }
+
+    .top-tab:hover {
+      color: #0f172a;
+      border-color: var(--border-gray-dark);
+      background-color: #f8fafc;
+    }
+
+    .top-tab.active {
+      border: 2px solid var(--accent-blue);
+      border-bottom: 3.5px solid var(--accent-blue);
+      background-color: transparent;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+
+    .notification-btn:hover {
+      color: #0f172a;
+    }
+
+    .profile-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #0ea5e9;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      user-select: none;
+      border: 2px solid var(--border-gray);
+    }
+
+    /* NESTED LAYOUT */
+    .app-container {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+
+    /* LEFT SUB-SIDEBAR */
+    .sidebar {
+      width: 280px;
+      background-color: var(--bg-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 10;
+      border-right: 2px solid var(--border-gray);
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: #334155;
+      font-weight: 500;
+      font-size: 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 2px solid var(--border-gray);
+      background-color: #ffffff;
+    }
+
+    .sidebar-item svg {
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .sidebar-item:hover {
+      background-color: #f8fafc;
+      color: #0f172a;
+      border-color: var(--border-gray-dark);
+    }
+
+    .sidebar-item.active {
+      background-color: #eff6ff;
+      color: #2563eb;
+      font-weight: 600;
+      border-color: #2563eb;
+    }
+
+    .sidebar-item.active svg {
+      color: #2563eb;
+    }
+
+    /* CENTER MAIN CONTENT WORKSPACE */
+    .workspace {
+      margin-left: 280px;
+      padding: 32px;
+      background-color: var(--bg-main);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .workspace-title {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #0f172a;
+    }
+
+    .status-pills {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background-color: #ffffff;
+      padding: 6px 14px;
+      border: 2px solid var(--border-gray);
+      border-radius: 20px;
+    }
+
+    .status-pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-green);
+    }
+
+    .status-pill .val {
+      color: var(--color-green);
+      font-weight: 700;
+    }
+
+    /* CARDS */
+    .card {
+      background-color: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 2px solid var(--border-gray);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+
+    /* KPI Cards Grid */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1200px) {
+      .kpi-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .kpi-card {
+      background-color: #ffffff;
+      border: 2px solid var(--border-gray);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .kpi-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    /* Sub Grids */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* progress bars */
+    .components-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      height: 100%;
+      justify-content: center;
+    }
+
+    .component-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .component-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .component-percentage {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .progress-bg {
+      background-color: #f1f5f9;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      width: 100%;
+      border: 2px solid var(--border-gray);
+    }
+
+    .progress-fill {
+      background-color: var(--accent-blue);
+      height: 100%;
+      border-radius: 5px;
+      transition: width 1s ease-in-out;
+    }
+
+    /* Circular gauge */
+    .gauge-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      height: 220px;
+    }
+
+    .gauge-container {
+      position: relative;
+      width: 220px;
+      height: 140px;
+    }
+
+    .gauge-score-wrapper {
+      position: absolute;
+      top: 75%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .gauge-score-text {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0f172a;
+    }
+
+    .gauge-score-max {
+      font-size: 20px;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .gauge-badge {
+      display: inline-block;
+      background-color: var(--color-green-light);
+      color: var(--color-green);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 10px;
+      border: 2px solid var(--border-gray);
+    }
+
+    /* High Risk Transparency Zones Styles */
+    .card.card-alert {
+      background-color: #ffffff;
+      border: 2px solid #bae6fd !important; /* soft light blue outline */
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.08), var(--shadow-md);
+    }
+
+    .analytics-panel-content {
+      display: flex;
+      gap: 20px;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .ranked-zones-container {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .alerts-insights-container {
+      flex: 1.3;
+      display: flex;
+      flex-direction: column;
+      border-left: 2px solid var(--border-gray);
+      padding-left: 16px;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .risk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .risk-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--border-gray);
+    }
+
+    .risk-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .risk-row-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .risk-zone-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .risk-stats {
+      font-size: 11.5px;
+      color: var(--text-light);
+      display: flex;
+      gap: 8px;
+    }
+    
+    .risk-stats .separator {
+      color: #cbd5e1;
+    }
+
+    .risk-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .indicator-red {
+      background-color: #ef4444;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+      animation: pulse-red-indicator 1.5s infinite;
+    }
+
+    .indicator-orange {
+      background-color: #f97316;
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+      animation: pulse-orange-indicator 1.5s infinite;
+    }
+
+    .indicator-yellow {
+      background-color: #eab308;
+      box-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
+      animation: pulse-yellow-indicator 1.5s infinite;
+    }
+
+    @keyframes pulse-red-indicator {
+      0% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+      100% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    @keyframes pulse-orange-indicator {
+      0% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
+      100% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+    }
+
+    @keyframes pulse-yellow-indicator {
+      0% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(234, 179, 8, 0); }
+      100% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+    }
+
+    /* Glowing Risk Badges styles */
+    .badge-glow-red {
+      background-color: #fee2e2;
+      color: #ef4444;
+      border: 1.5px solid #fca5a5;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
+      font-size: 10px;
+      padding: 2px 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 12px;
+      animation: badge-pulse-red 2s infinite alternate;
+    }
+    .badge-glow-orange {
+      background-color: #ffedd5;
+      color: #ea580c;
+      border: 1.5px solid #fed7aa;
+      box-shadow: 0 0 10px rgba(234, 88, 12, 0.45);
+      font-size: 10px;
+      padding: 2px 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 12px;
+      animation: badge-pulse-orange 2s infinite alternate;
+    }
+    .badge-glow-yellow {
+      background-color: #fef9c3;
+      color: #854d0e;
+      border: 1.5px solid #fef08a;
+      box-shadow: 0 0 10px rgba(234, 179, 8, 0.45);
+      font-size: 10px;
+      padding: 2px 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 12px;
+      animation: badge-pulse-yellow 2s infinite alternate;
+    }
+
+    @keyframes badge-pulse-red {
+      0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.3); }
+      100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.6); }
+    }
+    @keyframes badge-pulse-orange {
+      0% { box-shadow: 0 0 4px rgba(234, 88, 12, 0.3); }
+      100% { box-shadow: 0 0 12px rgba(234, 88, 12, 0.6); }
+    }
+    @keyframes badge-pulse-yellow {
+      0% { box-shadow: 0 0 4px rgba(234, 179, 8, 0.3); }
+      100% { box-shadow: 0 0 12px rgba(234, 179, 8, 0.6); }
+    }
+
+    /* Live pulse dot for Blue active monitor */
+    .pulse-dot-blue {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #3b82f6;
+      display: inline-block;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+      animation: pulse-blue-indicator 1.5s infinite;
+    }
+
+    @keyframes pulse-blue-indicator {
+      0% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+      100% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+
+    /* Subtitle in panels */
+    .panel-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border-gray);
+      padding-bottom: 4px;
+    }
+
+    /* Live Alerts Stack */
+    .live-alerts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .live-alert-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      background-color: #f8fafc;
+      border: 1.5px solid var(--border-gray);
+      transition: all 0.2s ease;
+    }
+
+    .live-alert-item:hover {
+      transform: translateX(2px);
+      background-color: #f1f5f9;
+    }
+
+    .live-alert-item.alert-red {
+      border-left: 3px solid #ef4444;
+    }
+    
+    .live-alert-item.alert-orange {
+      border-left: 3px solid #f97316;
+    }
+
+    .live-alert-item.alert-yellow {
+      border-left: 3px solid #eab308;
+    }
+
+    .alert-marker {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .alert-red .alert-marker {
+      background-color: #ef4444;
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+    }
+    .alert-orange .alert-marker {
+      background-color: #f97316;
+      box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);
+    }
+    .alert-yellow .alert-marker {
+      background-color: #eab308;
+      box-shadow: 0 0 6px rgba(234, 179, 8, 0.6);
+    }
+
+    .alert-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .alert-category {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .alert-red .alert-category { color: #ef4444; }
+    .alert-orange .alert-category { color: #ea580c; }
+    .alert-yellow .alert-category { color: #a16207; }
+
+    .alert-msg {
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.25;
+    }
+
+    .live-monitor-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #3b82f6;
+      background-color: #eff6ff;
+      border: 2px solid var(--border-gray);
+      padding: 6px 12px;
+      border-radius: 20px;
+      align-self: flex-start;
+    }
+
+    .ai-box {
+      background-color: #f8fafc;
+      border: 2px solid var(--border-gray);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .ai-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 5px;
+      background-color: var(--accent-blue);
+      border-top-left-radius: var(--radius-md);
+      border-bottom-left-radius: var(--radius-md);
+    }
+
+    .ai-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .ai-item {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .ai-item:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Heatmap / Map wrappers */
+    .heatmap-img-wrapper {
+      position: relative;
+      height: 220px;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border-gray);
+    }
+
+    .heatmap-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Tables */
+    .table-wrapper {
+      overflow-x: auto;
+      border: 2px solid var(--border-gray);
+      border-radius: var(--radius-md);
+      background-color: #ffffff;
+      margin-top: 10px;
+    }
+
+    .dashboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .dashboard-table th {
+      background-color: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--border-gray);
+    }
+
+    .dashboard-table td {
+      padding: 12px 16px;
+      border-bottom: 1.5px solid var(--border-gray);
+      color: var(--text-dark);
+    }
+
+    .dashboard-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1.5px solid var(--border-gray);
+    }
+
+    .badge-green { background-color: var(--color-green-light); color: var(--color-green); border-color: var(--color-green); }
+    .badge-blue { background-color: var(--accent-blue-light); color: var(--accent-blue); border-color: var(--accent-blue); }
+    .badge-red { background-color: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+    .badge-orange { background-color: #ffedd5; color: #ea580c; border-color: #fed7aa; }
+
+    /* Visual Timeline */
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin: 24px 0;
+      padding: 0 10px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: var(--border-gray);
+      z-index: 1;
+    }
+
+    .timeline-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      flex: 1;
+    }
+
+    .timeline-node {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      border: 3px solid var(--border-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+
+    .timeline-step.active .timeline-node {
+      border-color: var(--accent-blue);
+      background-color: var(--accent-blue-light);
+      color: var(--accent-blue);
+    }
+
+    .timeline-step.completed .timeline-node {
+      border-color: var(--color-green);
+      background-color: var(--color-green-light);
+      color: var(--color-green);
+    }
+
+    .timeline-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .timeline-step.active .timeline-label {
+      color: var(--accent-blue);
+    }
+
+    .timeline-step.completed .timeline-label {
+      color: var(--color-green);
+    }
+
+    /* Live repair map with marker overlays */
+    .live-map-wrapper {
+      position: relative;
+      height: 250px;
+      background-color: #f1f5f9;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 2px solid var(--border-gray);
+    }
+
+    .map-pin {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background-color: var(--accent-blue);
+      border: 2.5px solid #ffffff;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 0 8px rgba(0,0,0,0.15);
+    }
+
+    .map-pin::after {
+      content: '';
+      position: absolute;
+      top: -8px; left: -8px; right: -8px; bottom: -8px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-blue);
+      animation: pinPulse 1.5s infinite;
+      opacity: 0;
+    }
+
+    @keyframes pinPulse {
+      0% { transform: scale(0.6); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    .map-pin.pin-red { background-color: #ef4444; }
+    .map-pin.pin-red::after { border-color: #ef4444; }
+    .map-pin.pin-orange { background-color: #f97316; }
+    .map-pin.pin-orange::after { border-color: #f97316; }
+    .map-pin.pin-blue { background-color: #3b82f6; }
+    .map-pin.pin-blue::after { border-color: #3b82f6; }
+
+    .pin-tooltip {
+      visibility: hidden;
+      position: absolute;
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      width: 190px;
+      z-index: 30;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      transition: visibility 0.2s ease, opacity 0.2s ease;
+      opacity: 0;
+      line-height: 1.4;
+    }
+
+    .map-pin:hover .pin-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Before After Image Slider */
+    .slider-container {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 2px solid var(--border-gray);
+    }
+
+    .slider-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .slider-img.after {
+      background-image: url('repaired_road.png');
+    }
+
+    .slider-img.before {
+      background-image: url('damaged_road.png');
+      width: 50%;
+      border-right: 3px solid #ffffff;
+    }
+
+    .slider-label {
+      position: absolute;
+      bottom: 12px;
+      background-color: rgba(15, 23, 42, 0.75);
+      color: #ffffff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .slider-label.before-label { left: 12px; }
+    .slider-label.after-label { right: 12px; }
+
+    .slider-handle {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 4px;
+      background-color: #ffffff;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .slider-handle::after {
+      content: '↔';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px; height: 32px;
+      background-color: #3b82f6;
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      border: 2px solid #ffffff;
+    }
+
+    /* Completed Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .gallery-card {
+      border: 2px solid var(--border-gray);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+
+    .gallery-img-wrapper {
+      height: 120px;
+      background-color: #e2e8f0;
+      position: relative;
+    }
+
+    .gallery-title {
+      padding: 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* Chart Wrappers height adjustment */
+    .chart-container-large {
+      position: relative;
+      height: 250px;
+      width: 100%;
+    }
+
+    /* Workspace section transition system */
+    .workspace-section {
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .workspace-section.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* FOOTER */
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 16px 0 0 0;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-light);
+      margin-top: auto;
+    }
+
+    /* Profile Dropdown Menu */
+    .profile-dropdown {
+      position: absolute;
+      top: 55px;
+      right: 0;
+      width: 250px;
+      background-color: #ffffff;
+      border: 2px solid var(--border-gray);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      padding: 8px 0;
+      animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top right;
+      text-align: left;
+    }
+
+    .profile-dropdown.show {
+      display: flex;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .dropdown-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+    }
+
+    .dropdown-user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #3b82f6;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1.5px solid var(--border-gray);
+    }
+
+    .dropdown-user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .dropdown-user-info .user-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .dropdown-user-info .user-role {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    .dropdown-divider {
+      height: 1.5px;
+      background-color: var(--border-gray);
+      margin: 6px 0;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+      background-color: #eff6ff;
+      color: #3b82f6;
+    }
+
+    .dropdown-item .dropdown-icon {
+      font-size: 16px;
+    }
+
+    .dropdown-item.logout-item {
+      color: #ef4444;
+    }
+
+    .dropdown-item.logout-item:hover {
+      background-color: #fee2e2;
+      color: #ef4444;
+    }
+
+    /* Modal overlay and content */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      animation: fadeInOverlay 0.2s ease-out;
+    }
+
+    .modal-overlay.show {
+      display: block;
+    }
+
+    .logout-modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      width: 90%;
+      max-width: 400px;
+      background-color: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--border-gray);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      z-index: 2001;
+      display: none;
+      padding: 32px 24px;
+      text-align: center;
+      opacity: 0;
+      transition: all 0.2s ease-out;
+    }
+
+    .logout-modal.show {
+      display: block;
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .logout-warning-icon {
+      font-size: 44px;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .logout-modal h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .logout-modal p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .logout-modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 10px 24px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid var(--border-gray);
+    }
+
+    .btn-cancel {
+      background-color: #ffffff;
+      color: var(--text-muted);
+    }
+
+    .btn-cancel:hover {
+      background-color: #f1f5f9;
+      color: var(--text-dark);
+      border-color: #cbd5e1;
+    }
+
+    .btn-logout {
+      background-color: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+    }
+
+    .btn-logout:hover {
+      background-color: #dc2626;
+      border-color: #dc2626;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+
+
+  <!-- APP CONTAINER -->
+  <div class="app-container">
+
+    <!-- LEFT SUB-SIDEBAR -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-item active" data-section="content-transparency-score">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Transparency Score
+        </a>
+        <a href="#" class="sidebar-item" data-section="content-budget-overview">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          Budget Overview
+        </a>
+        <a href="#" class="sidebar-item" data-section="content-repair-tracking">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+          Repair Tracking
+        </a>
+        <a href="#" class="sidebar-item" data-section="content-maintenance-history">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Maintenance History
+        </a>
+        <a href="#" class="sidebar-item" data-section="content-budget-analytics">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Budget Analytics
+        </a>
+        <a href="#" class="sidebar-item" data-section="content-completed-projects">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          Completed Projects
+        </a>
+      </nav>
+    </aside>
+
+    <!-- CENTER MAIN CONTENT WORKSPACE -->
+    <main class="workspace">
+      
+      <!-- WORKSPACE HEADER ACTIONS (Topbar replacement for profile dropdown) -->
+      <div class="workspace-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; width: 100%;">
+          <a href="dashboard.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #475569; font-weight: 600; font-size: 14px; background: #ffffff; padding: 6px 14px; border: 2px solid var(--border-gray); border-radius: 20px; transition: all 0.2s ease;">
+              <span>← Back to Dashboard</span>
+          </a>
+          <div style="display: flex; align-items: center; gap: 16px;">
+              <div id="profile-dropdown-trigger" style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; border: 2px solid var(--border-gray); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer;">
+                  <img src="https://ui-avatars.com/api/?name=Admin+User&background=0ea5e9&color=fff&bold=true" alt="User Profile" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+
+              <!-- PROFILE DROPDOWN MENU -->
+              <div id="profile-dropdown" class="profile-dropdown" style="top: 55px; right: 0;">
+                  <div class="dropdown-header">
+                      <div class="dropdown-user-avatar">AU</div>
+                      <div class="dropdown-user-info">
+                          <span class="user-name">Admin User</span>
+                          <span class="user-role">System Administrator</span>
+                      </div>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <a href="profile.html" class="dropdown-item">
+                      <span class="dropdown-icon">👤</span>
+                      <span>Profile Information</span>
+                  </a>
+                  <a href="settings.html" class="dropdown-item">
+                      <span class="dropdown-icon">⚙️</span>
+                      <span>Safety & Privacy</span>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a href="#" id="logout-trigger" class="dropdown-item logout-item">
+                      <span class="dropdown-icon">🚪</span>
+                      <span>Logout</span>
+                  </a>
+              </div>
+          </div>
+      </div>
+      <div class="card" style="margin-bottom: 24px; padding: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+          <div>
+            <h1 class="workspace-title" id="page-content-title" style="margin-bottom: 8px;">Transparency</h1>
+            <p id="page-content-subtitle" style="color: var(--text-light); font-size: 15px; max-width: 650px;">
+              Monitor public accountability metrics, track budget utilization, analyze infrastructure performance and maintain public transparency across Chennai.
+            </p>
+          </div>
+          <div class="status-pills">
+            <div class="status-pill">
+              <span class="dot"></span>
+              <span>Citizen Feedback: <span class="val">Active</span></span>
+            </div>
+            <div class="status-pill">
+              <span class="dot"></span>
+              <span>AI Data Verification: <span class="val">98%</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECTION 1: TRANSPARENCY SCORE -->
+      <!-- ========================================== -->
+      <div id="content-transparency-score" class="workspace-section active">
+        <!-- A. KPI Cards Row -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-title">Citizen Trust Index</div>
+            <div class="kpi-value">84%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">AI Verification Accuracy</div>
+            <div class="kpi-value">98.4%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Complaint Resolution</div>
+            <div class="kpi-value">91.2%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Corruption Risk</div>
+            <div class="kpi-value" style="color: var(--color-green);">Very Low</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Public Satisfaction</div>
+            <div class="kpi-value">4.5/5</div>
+          </div>
+        </div>
+
+        <!-- Dashboard Grid (2x2) -->
+        <div class="dashboard-grid">
+          <!-- Card 1: Gauge -->
+          <div class="card">
+            <div class="card-title">City-Wide Transparency Score</div>
+            <div class="gauge-wrapper">
+              <div class="gauge-container">
+                <canvas id="gaugeCanvas"></canvas>
+                <div class="gauge-score-wrapper">
+                  <span class="gauge-score-text">78</span><span class="gauge-score-max">/100</span>
+                </div>
+              </div>
+              <div class="gauge-badge">Highly Transparent</div>
+            </div>
+          </div>
+
+          <!-- Card 2: Progress Bars -->
+          <div class="card">
+            <div class="card-title">Score Components</div>
+            <div class="components-wrapper">
+              <div class="component-item">
+                <div class="component-label-row">
+                  <span>Citizen Engagement</span>
+                  <span class="component-percentage">(85%)</span>
+                </div>
+                <div class="progress-bg">
+                  <div class="progress-fill" style="width: 85%"></div>
+                </div>
+              </div>
+              <div class="component-item">
+                <div class="component-label-row">
+                  <span>Data Accuracy</span>
+                  <span class="component-percentage">(72%)</span>
+                </div>
+                <div class="progress-bg">
+                  <div class="progress-fill" style="width: 72%"></div>
+                </div>
+              </div>
+              <div class="component-item">
+                <div class="component-label-row">
+                  <span>Budget Clarity</span>
+                  <span class="component-percentage">(65%)</span>
+                </div>
+                <div class="progress-bg">
+                  <div class="progress-fill" style="width: 65%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Trend Line Graph -->
+          <div class="card">
+            <div class="card-title">Transparency Score Trend (12 Months)</div>
+            <div class="chart-wrapper">
+              <canvas id="trendChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Card 4: High Risk Transparency Zones -->
+          <div class="card card-alert">
+            <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span>High Risk Transparency Zones</span>
+              <div class="live-monitor-pill" style="margin: 0; font-size: 11px; padding: 4px 10px; border-color: #bae6fd;">
+                <span class="pulse-dot-blue"></span>
+                <span>AI Transparency Monitoring Active</span>
+              </div>
+            </div>
+            
+            <div class="analytics-panel-content">
+              <!-- Left side: ranked list -->
+              <div class="ranked-zones-container">
+                <div class="panel-subtitle">Risk Ranking by Zone</div>
+                <div class="risk-list">
+                  <!-- Row 1: OMR Road -->
+                  <div class="risk-row">
+                    <div class="risk-row-left">
+                      <span class="risk-indicator indicator-red"></span>
+                      <span class="risk-zone-name">1. OMR Road</span>
+                    </div>
+                    <div class="risk-stats">
+                      <span>Complaints: <strong>142</strong></span>
+                      <span class="separator">|</span>
+                      <span>Delays: <strong>9</strong></span>
+                    </div>
+                    <span class="badge badge-glow-red">92% Risk</span>
+                  </div>
+                  <!-- Row 2: Velachery -->
+                  <div class="risk-row">
+                    <div class="risk-row-left">
+                      <span class="risk-indicator indicator-red"></span>
+                      <span class="risk-zone-name">2. Velachery</span>
+                    </div>
+                    <div class="risk-stats">
+                      <span>Complaints: <strong>118</strong></span>
+                      <span class="separator">|</span>
+                      <span>Delays: <strong>7</strong></span>
+                    </div>
+                    <span class="badge badge-glow-red">85% Risk</span>
+                  </div>
+                  <!-- Row 3: Anna Salai -->
+                  <div class="risk-row">
+                    <div class="risk-row-left">
+                      <span class="risk-indicator indicator-orange"></span>
+                      <span class="risk-zone-name">3. Anna Salai</span>
+                    </div>
+                    <div class="risk-stats">
+                      <span>Complaints: <strong>94</strong></span>
+                      <span class="separator">|</span>
+                      <span>Delays: <strong>4</strong></span>
+                    </div>
+                    <span class="badge badge-glow-orange">80% Risk</span>
+                  </div>
+                  <!-- Row 4: Tambaram -->
+                  <div class="risk-row">
+                    <div class="risk-row-left">
+                      <span class="risk-indicator indicator-orange"></span>
+                      <span class="risk-zone-name">4. Tambaram</span>
+                    </div>
+                    <div class="risk-stats">
+                      <span>Complaints: <strong>81</strong></span>
+                      <span class="separator">|</span>
+                      <span>Delays: <strong>5</strong></span>
+                    </div>
+                    <span class="badge badge-glow-orange">74% Risk</span>
+                  </div>
+                  <!-- Row 5: T Nagar -->
+                  <div class="risk-row">
+                    <div class="risk-row-left">
+                      <span class="risk-indicator indicator-yellow"></span>
+                      <span class="risk-zone-name">5. T Nagar</span>
+                    </div>
+                    <div class="risk-stats">
+                      <span>Complaints: <strong>65</strong></span>
+                      <span class="separator">|</span>
+                      <span>Delays: <strong>2</strong></span>
+                    </div>
+                    <span class="badge badge-glow-yellow">68% Risk</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Right side: AI insights and live alerts feed -->
+              <div class="alerts-insights-container">
+                <div class="panel-subtitle">AI Alerts & Live Feed</div>
+                
+                <div class="ai-box" style="margin-bottom: 0; padding: 10px; border-width: 1.5px; border-radius: 8px;">
+                  <div class="ai-title" style="font-size: 11px; margin-bottom: 4px;">🤖 Risk Insights</div>
+                  <div class="ai-item" style="font-size: 10.5px; margin-bottom: 3px; line-height: 1.25; color: #475569;">
+                    ⚠️ Repeated contractor delays detected in OMR.
+                  </div>
+                  <div class="ai-item" style="font-size: 10.5px; margin-bottom: 3px; line-height: 1.25; color: #475569;">
+                    ⚠️ Budget irregularities flagged in Velachery.
+                  </div>
+                  <div class="ai-item" style="font-size: 10.5px; margin-bottom: 0; line-height: 1.25; color: #475569;">
+                    📈 Citizen complaints increasing in Tambaram.
+                  </div>
+                </div>
+
+                <div class="live-alerts-list">
+                  <div class="live-alert-item alert-red">
+                    <span class="alert-marker"></span>
+                    <div class="alert-content">
+                      <div class="alert-category">Corruption Risk</div>
+                      <div class="alert-msg">Top high-risk corruption zone flagged on OMR Bypass.</div>
+                    </div>
+                  </div>
+                  <div class="live-alert-item alert-orange">
+                    <span class="alert-marker"></span>
+                    <div class="alert-content">
+                      <div class="alert-category">Delayed Repairs</div>
+                      <div class="alert-msg">Active repair delays in Tambaram region.</div>
+                    </div>
+                  </div>
+                  <div class="live-alert-item alert-red">
+                    <span class="alert-marker"></span>
+                    <div class="alert-content">
+                      <div class="alert-category">Budget Misuse</div>
+                      <div class="alert-msg">Velachery: budget irregularities & overflow warning.</div>
+                    </div>
+                  </div>
+                  <div class="live-alert-item alert-orange">
+                    <span class="alert-marker"></span>
+                    <div class="alert-content">
+                      <div class="alert-category">High Complaints</div>
+                      <div class="alert-msg">High complaint regions active: OMR & Velachery.</div>
+                    </div>
+                  </div>
+                  <div class="live-alert-item alert-yellow">
+                    <span class="alert-marker"></span>
+                    <div class="alert-content">
+                      <div class="alert-category">Repeated Failures</div>
+                      <div class="alert-msg">Repeated maintenance failures on Anna Salai.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Insights Box -->
+        <div class="ai-box">
+          <div class="ai-title">🤖 AI Transparency Insights</div>
+          <div class="ai-item">💡 <strong>Anna Nagar:</strong> Accountability index increased by 12% following live camera integrations.</div>
+          <div class="ai-item">⚠️ <strong>Approvals:</strong> Delayed roadwork verification audits in Tambaram reduced the local compliance rating.</div>
+          <div class="ai-item">🏆 <strong>Most Transparent:</strong> T. Nagar ranks highest in public fund logging accuracy (95% score).</div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECTION 2: BUDGET OVERVIEW -->
+      <!-- ========================================== -->
+      <div id="content-budget-overview" class="workspace-section">
+        <!-- Total Budget Cards -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-title">Total Allocated Budget</div>
+            <div class="kpi-value">$8.5M</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Used Budget</div>
+            <div class="kpi-value">$5.2M</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Remaining Budget</div>
+            <div class="kpi-value">$3.3M</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Emergency Repair Fund</div>
+            <div class="kpi-value">$1.0M</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Utilization Rate</div>
+            <div class="kpi-value">61.2%</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-bottom: 24px;">
+          <!-- Donut chart -->
+          <div class="card">
+            <div class="card-title">Budget Distribution Breakdown</div>
+            <div class="chart-container-large">
+              <canvas id="budgetDonutCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- AI Budget Analysis & Alerts -->
+          <div class="card" style="justify-content: flex-start; gap: 16px;">
+            <div class="card-title">AI Financial Analysis & Integrity</div>
+            <div class="ai-box" style="margin-bottom: 0;">
+              <div class="ai-title">🤖 AI Budget Analysis</div>
+              <div class="ai-item">📈 <strong>Velachery:</strong> Drainage expansions caused an 8% budget overflow.</div>
+              <div class="ai-item">🏆 <strong>Anna Nagar:</strong> Highest repair-cost efficiency index (94% score).</div>
+              <div class="ai-item">🔍 <strong>Tambaram:</strong> Unused funds ($500k) detected; recommendation is reallocation.</div>
+            </div>
+            
+            <div class="card" style="background-color: #fff5f5; border-color: #fca5a5; padding: 16px;">
+              <div style="font-weight: 700; color: #dc2626; display: flex; align-items: center; gap: 8px; font-size: 13.5px;">
+                🚨 INTEGRITY ALERTS & FRAUD DETECTION
+              </div>
+              <div style="font-size: 13px; color: #7f1d1d; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                <div>• <strong>Suspicious Spending Flag:</strong> Duplicate invoice claimed for road resurfacing in Guindy (Flagged).</div>
+                <div>• <strong>Billing Delay Alert:</strong> Vels Contracting is 12 days past SLA in billing submission.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Budget Allocation Table -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-title">Regional Budget Allocations</div>
+          <div class="table-wrapper">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Area</th>
+                  <th>Allocated</th>
+                  <th>Used</th>
+                  <th>Remaining</th>
+                  <th>Contractor</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Anna Nagar</td>
+                  <td>$1,500,000</td>
+                  <td>$1,200,000</td>
+                  <td>$300,000</td>
+                  <td>Metro Infra Ltd</td>
+                  <td><span class="badge badge-green">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>OMR Bypass</td>
+                  <td>$2,400,000</td>
+                  <td>$1,900,000</td>
+                  <td>$500,000</td>
+                  <td>Apex Roads Corp</td>
+                  <td><span class="badge badge-blue">Ongoing</span></td>
+                </tr>
+                <tr>
+                  <td>Velachery</td>
+                  <td>$1,800,000</td>
+                  <td>$1,944,000</td>
+                  <td style="color: #dc2626; font-weight: 700;">-$144,000</td>
+                  <td>Southern Builders</td>
+                  <td><span class="badge badge-red">Over Budget</span></td>
+                </tr>
+                <tr>
+                  <td>Tambaram</td>
+                  <td>$1,300,000</td>
+                  <td>$800,000</td>
+                  <td>$500,000</td>
+                  <td>City Works India</td>
+                  <td><span class="badge badge-orange">Pending</span></td>
+                </tr>
+                <tr>
+                  <td>T Nagar</td>
+                  <td>$1,500,000</td>
+                  <td>$1,350,000</td>
+                  <td>$150,000</td>
+                  <td>Vels Contracting</td>
+                  <td><span class="badge badge-green">Completed</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECTION 3: REPAIR TRACKING -->
+      <!-- ========================================== -->
+      <div id="content-repair-tracking" class="workspace-section">
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-title">Repairs In Progress</div>
+            <div class="kpi-value">18</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Pending Repairs</div>
+            <div class="kpi-value">42</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Emergency Repairs</div>
+            <div class="kpi-value">3</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Completed Repairs</div>
+            <div class="kpi-value">320</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Average SLA Met</div>
+            <div class="kpi-value">94.8%</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-bottom: 24px;">
+          <!-- Visual Timeline & AI Panel -->
+          <div class="card" style="justify-content: flex-start; gap: 16px;">
+            <div class="card-title">Repair Progress Lifecycle</div>
+            
+            <div class="timeline">
+              <div class="timeline-step completed">
+                <div class="timeline-node">1</div>
+                <div class="timeline-label">Reported</div>
+              </div>
+              <div class="timeline-step completed">
+                <div class="timeline-node">2</div>
+                <div class="timeline-label">Approved</div>
+              </div>
+              <div class="timeline-step completed">
+                <div class="timeline-node">3</div>
+                <div class="timeline-label">Assigned</div>
+              </div>
+              <div class="timeline-step active">
+                <div class="timeline-node">4</div>
+                <div class="timeline-label">Under Repair</div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-node">5</div>
+                <div class="timeline-label">Completed</div>
+              </div>
+            </div>
+
+            <div class="ai-box" style="margin-top: 10px;">
+              <div class="ai-title">🤖 AI Damage Detection Alerts</div>
+              <div class="ai-item">📡 <strong>OMR bypass:</strong> AI camera detected severe pothole depth expansion (Urgent).</div>
+              <div class="ai-item">🔄 <strong>Anna Salai:</strong> Repeated damage patterns flag weak sub-surface structural base.</div>
+              <div class="ai-item">⏰ <strong>Tambaram:</strong> Repair delay threshold warnings triggered for contractor Apex Roads.</div>
+            </div>
+          </div>
+
+          <!-- Live Chennai Repair Map Mockup -->
+          <div class="card">
+            <div class="card-title">Live Chennai Infrastructure Alerts Map</div>
+            <div class="live-map-wrapper">
+              <!-- Overlay map image -->
+              <img src="chennai_heatmap.png" alt="Chennai Map" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+              
+              <!-- marker pins overlaying coordinates -->
+              <div class="map-pin pin-red" style="top: 70%; left: 52%;">
+                <div class="pin-tooltip"><strong>OMR Bypass</strong><br>Pothole Alert (Severe)<br>Status: Under Repair<br>ETA: 8 Hours</div>
+              </div>
+              <div class="map-pin pin-orange" style="top: 40%; left: 40%;">
+                <div class="pin-tooltip"><strong>Anna Salai</strong><br>Surface Crack (Medium)<br>Status: Assigned<br>ETA: 24 Hours</div>
+              </div>
+              <div class="map-pin pin-blue" style="top: 60%; left: 35%;">
+                <div class="pin-tooltip"><strong>Velachery Main Rd</strong><br>Drainage Clog (Severe)<br>Status: Investigating<br>ETA: 3 Hours</div>
+              </div>
+              <div class="map-pin pin-red" style="top: 48%; left: 45%;">
+                <div class="pin-tooltip"><strong>T Nagar Center</strong><br>Pothole Alert (Severe)<br>Status: Under Repair<br>ETA: 1 Hour</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Repair Requests Table -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-title">Active Infrastructure Repair Requests</div>
+          <div class="table-wrapper">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Road Name</th>
+                  <th>Damage Type</th>
+                  <th>Severity</th>
+                  <th>Assigned Team</th>
+                  <th>ETA</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>OMR Bypass Section 3</td>
+                  <td>Severe Pothole</td>
+                  <td><span class="badge badge-red">High</span></td>
+                  <td>Team Delta (Metro)</td>
+                  <td>8 Hours</td>
+                  <td><span class="badge badge-blue">Ongoing</span></td>
+                </tr>
+                <tr>
+                  <td>Anna Salai Arterial</td>
+                  <td>Surface Asphalt Crack</td>
+                  <td><span class="badge badge-orange">Medium</span></td>
+                  <td>Team Alpha (Civic)</td>
+                  <td>24 Hours</td>
+                  <td><span class="badge badge-orange">Assigned</span></td>
+                </tr>
+                <tr>
+                  <td>Velachery Link Road</td>
+                  <td>Storm Drain Clog</td>
+                  <td><span class="badge badge-red">High</span></td>
+                  <td>Team Omega (Drainage)</td>
+                  <td>3 Hours</td>
+                  <td><span class="badge badge-red">Emergency</span></td>
+                </tr>
+                <tr>
+                  <td>Tambaram Link Road</td>
+                  <td>Zebra Crossing Faded</td>
+                  <td><span class="badge badge-blue">Low</span></td>
+                  <td>Team Beta (Markings)</td>
+                  <td>5 Days</td>
+                  <td><span class="badge badge-orange">Pending</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECTION 4: MAINTENANCE HISTORY -->
+      <!-- ========================================== -->
+      <div id="content-maintenance-history" class="workspace-section">
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-title">Total Repairs This Year</div>
+            <div class="kpi-value">438</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Average Repair Time</div>
+            <div class="kpi-value">4.2 Days</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Most Damaged Zone</div>
+            <div class="kpi-value" style="color: var(--accent-blue);">Velachery</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Maintenance Efficiency</div>
+            <div class="kpi-value">92.4%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Sensor Downtime</div>
+            <div class="kpi-value">0.12%</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-bottom: 24px;">
+          <!-- Historical timeline graph -->
+          <div class="card">
+            <div class="card-title">Yearly Maintenance Records Trend</div>
+            <div class="chart-container-large">
+              <canvas id="historyChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Repeat Damage & Suggestions -->
+          <div class="card" style="justify-content: flex-start; gap: 16px;">
+            <div class="card-title">Repeat Damage Analysis</div>
+            
+            <div class="card" style="border-color: #fed7aa; background-color: #fffbeb; padding: 16px; margin-bottom: 4px;">
+              <div style="font-weight: 700; color: #ea580c; font-size: 13.5px;">⚠️ REPEAT DAMAGE WARNINGS</div>
+              <div style="font-size: 13px; color: #7c2d12; margin-top: 8px;">
+                <strong>Velachery Road:</strong> 4 patchworks logged in the past 12 months. Sub-base structural failure detected. Complete resurfacing recommended.
+              </div>
+            </div>
+
+            <div class="ai-box" style="margin-bottom: 0;">
+              <div class="ai-title">🤖 AI Maintenance Recommendations</div>
+              <div class="ai-item">🛠️ <strong>OMR:</strong> Apply polymer-modified bitumen resurfacing to withstand high heavy-vehicle volumes.</div>
+              <div class="ai-item">⛈️ <strong>Drainage:</strong> Heavy monsoon blockages recur on Velachery Link Road. Expand Storm drainage diameter.</div>
+              <div class="ai-item">⚠️ <strong>Strategy:</strong> Patchwork fixes reduce road lifespan by 22% compared to full overlay repairs.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Past Maintenance Records Table -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-title">Past Infrastructure Maintenance Log</div>
+          <div class="table-wrapper">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Completion Date</th>
+                  <th>Area</th>
+                  <th>Problem Type</th>
+                  <th>Contractor</th>
+                  <th>Total Cost</th>
+                  <th>Quality Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>12 May 2026</td>
+                  <td>Anna Nagar</td>
+                  <td>Street Cave-In Repair</td>
+                  <td>Metro Infra Ltd</td>
+                  <td>$45,000</td>
+                  <td><span class="badge badge-green">9.6 / 10</span></td>
+                </tr>
+                <tr>
+                  <td>28 Apr 2026</td>
+                  <td>OMR Bypass</td>
+                  <td>Bitumen Resurfacing</td>
+                  <td>Apex Roads Corp</td>
+                  <td>$12,000</td>
+                  <td><span class="badge badge-green">9.2 / 10</span></td>
+                </tr>
+                <tr>
+                  <td>15 Mar 2026</td>
+                  <td>Guindy Industrial</td>
+                  <td>Traffic System Calibration</td>
+                  <td>City Electricals</td>
+                  <td>$8,500</td>
+                  <td><span class="badge badge-blue">8.9 / 10</span></td>
+                </tr>
+                <tr>
+                  <td>02 Feb 2026</td>
+                  <td>T Nagar</td>
+                  <td>Storm Drain Tunnel Overhaul</td>
+                  <td>Vels Contracting</td>
+                  <td>$120,000</td>
+                  <td><span class="badge badge-green">9.5 / 10</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECTION 5: BUDGET ANALYTICS -->
+      <!-- ========================================== -->
+      <div id="content-budget-analytics" class="workspace-section">
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-title">Cost Efficiency Score</div>
+            <div class="kpi-value" style="color: var(--accent-blue);">A+</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Average Repair Cost</div>
+            <div class="kpi-value">$8,200</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Budget Waste %</div>
+            <div class="kpi-value" style="color: var(--color-green);">1.8%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Contractor Reliability</div>
+            <div class="kpi-value">94.0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Audited Transactions</div>
+            <div class="kpi-value">100%</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-bottom: 24px;">
+          <!-- Graph 1: Spending Trends -->
+          <div class="card">
+            <div class="card-title">Monthly Allocations vs Actual Spending</div>
+            <div class="chart-container-large">
+              <canvas id="analyticsSpendCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Graph 2: Zone efficiency -->
+          <div class="card">
+            <div class="card-title">Zone Efficiency Radar</div>
+            <div class="chart-container-large">
+              <canvas id="analyticsZoneCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Prediction & Table -->
+        <div class="dashboard-grid" style="margin-bottom: 24px;">
+          <div class="card" style="justify-content: flex-start; gap: 16px;">
+            <div class="card-title">AI Predictive Financial Modelling</div>
+            <div class="ai-box" style="margin-bottom: 0;">
+              <div class="ai-title">🤖 AI Financial Predictions</div>
+              <div class="ai-item">🌦️ <strong>Monsoon Forecast:</strong> Expected road maintenance cost to spike 14% due to rainfall index.</div>
+              <div class="ai-item">📉 <strong>Regional Outlook:</strong> South Chennai budget overflow warning triggered. Reallocate 5% from North surplus.</div>
+              <div class="ai-item">💡 <strong>Efficiency Index:</strong> Early preventative repairs using smart sensors can lower total cost by 22%.</div>
+            </div>
+            
+            <div class="ai-box" style="background-color: #eff6ff; border-color: #bfdbfe; margin-bottom: 0;">
+              <div class="ai-title" style="color: #2563eb;">💡 Smart Capital Recommendations</div>
+              <div class="ai-item" style="color: #1e3a8a;">1. Prioritize pre-monsoon storm drainage cleaning on low-lying arterial roads.</div>
+              <div class="ai-item" style="color: #1e3a8a;">2. Phase out low-cost patchwork contracts in heavy transit corridors.</div>
+            </div>
+          </div>
+
+          <!-- Comparative Table -->
+          <div class="card">
+            <div class="card-title">Zone Cost-Performance Comparison</div>
+            <div class="table-wrapper">
+              <table class="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Zone</th>
+                    <th>Avg Cost / km</th>
+                    <th>Quality Score</th>
+                    <th>Efficiency</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Anna Nagar</td>
+                    <td>$12,500</td>
+                    <td>9.4 / 10</td>
+                    <td><span class="badge badge-green">High</span></td>
+                  </tr>
+                  <tr>
+                    <td>OMR Bypass</td>
+                    <td>$18,200</td>
+                    <td>8.8 / 10</td>
+                    <td><span class="badge badge-blue">Medium</span></td>
+                  </tr>
+                  <tr>
+                    <td>Velachery</td>
+                    <td>$15,000</td>
+                    <td>8.2 / 10</td>
+                    <td><span class="badge badge-blue">Medium</span></td>
+                  </tr>
+                  <tr>
+                    <td>T Nagar</td>
+                    <td>$11,000</td>
+                    <td>9.5 / 10</td>
+                    <td><span class="badge badge-green">High</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECTION 6: COMPLETED PROJECTS -->
+      <!-- ========================================== -->
+      <div id="content-completed-projects" class="workspace-section">
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-title">Projects Completed</div>
+            <div class="kpi-value">1,248</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Roads Restored</div>
+            <div class="kpi-value">284 km</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Total Budget Utilized</div>
+            <div class="kpi-value">$5.2M</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Citizen Satisfaction</div>
+            <div class="kpi-value">92.0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Audits Passed</div>
+            <div class="kpi-value" style="color: var(--color-green);">100%</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-bottom: 24px;">
+          <!-- Before & After Comparison Slider -->
+          <div class="card">
+            <div class="card-title">Before & After Repair Visual Slider</div>
+            <div class="slider-container" id="before-after-slider">
+              <div class="slider-img after"></div>
+              <div class="slider-img before" id="slider-before-img"></div>
+              <span class="slider-label before-label">BEFORE REPAIR</span>
+              <span class="slider-label after-label">AFTER REPAIR</span>
+              <input type="range" min="0" max="100" value="50" class="slider-range" id="slider-control" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; z-index: 20;">
+              <div class="slider-handle" id="slider-divider-handle"></div>
+            </div>
+          </div>
+
+          <!-- Completed Projects Gallery -->
+          <div class="card" style="justify-content: flex-start;">
+            <div class="card-title">Restored Assets Showcase</div>
+            <div class="gallery-grid">
+              <div class="gallery-card">
+                <div class="gallery-img-wrapper">
+                  <img src="repaired_road.png" alt="Asphalt Resurfacing" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="gallery-title">Anna Nagar Paving</div>
+              </div>
+              <div class="gallery-card">
+                <div class="gallery-img-wrapper" style="background-color: #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #1e3a8a;">
+                  🌧️
+                </div>
+                <div class="gallery-title">Velachery Drain Fix</div>
+              </div>
+              <div class="gallery-card">
+                <div class="gallery-img-wrapper" style="background-color: #ddd6fe; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #4c1d95;">
+                  📡
+                </div>
+                <div class="gallery-title">OMR Smart Sensors</div>
+              </div>
+            </div>
+
+            <!-- Success Stories -->
+            <div class="ai-box" style="margin-top: 16px; margin-bottom: 0;">
+              <div class="ai-title" style="color: var(--color-green);">🏆 Project Success Stories</div>
+              <div class="ai-item">🌟 <strong>Anna Nagar:</strong> Citizen infrastructure complaints dropped by 70% post-resurfacing.</div>
+              <div class="ai-item">🌟 <strong>Velachery:</strong> drainage repairs finished 8 days ahead of schedule, mitigating flood risks.</div>
+              <div class="ai-item">🌟 <strong>Public Trust:</strong> Citizen satisfaction ratings increased by 18% in sensor-monitored zones.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project Details Table -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-title">Completed Public Works Projects Registry</div>
+          <div class="table-wrapper">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Project Name</th>
+                  <th>Area</th>
+                  <th>Contractor</th>
+                  <th>Approved Budget</th>
+                  <th>Completion Date</th>
+                  <th>Quality Rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Anna Nagar Main Resurfacing</td>
+                  <td>Anna Nagar</td>
+                  <td>Metro Infra Ltd</td>
+                  <td>$340,000</td>
+                  <td>12 May 2026</td>
+                  <td><span class="badge badge-green">9.6 / 10</span></td>
+                </tr>
+                <tr>
+                  <td>OMR Smart Road Sensor Deployment</td>
+                  <td>OMR</td>
+                  <td>Apex Roads Corp</td>
+                  <td>$120,000</td>
+                  <td>28 Apr 2026</td>
+                  <td><span class="badge badge-green">9.2 / 10</span></td>
+                </tr>
+                <tr>
+                  <td>Velachery storm water drainage conduit</td>
+                  <td>Velachery</td>
+                  <td>Southern Builders</td>
+                  <td>$850,000</td>
+                  <td>15 Feb 2026</td>
+                  <td><span class="badge badge-blue">8.9 / 10</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <span>Data last updated: 2 mins ago</span>
+      </footer>
+    </main>
+
+  </div>
+
+  <script>
+    // Chart.js Configuration
+    Chart.defaults.font.family = "'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    Chart.defaults.color = '#475569';
+
+    // Store references to chart objects
+    const charts = {};
+
+    function initAllCharts() {
+      // 1. Semi-Circular Gauge Chart
+      const ctxGauge = document.getElementById('gaugeCanvas');
+      if (ctxGauge) {
+        charts.gauge = new Chart(ctxGauge.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Score', 'Remaining'],
+            datasets: [{
+              data: [78, 22],
+              backgroundColor: ['#3b82f6', '#f1f5f9'],
+              borderWidth: 2,
+              borderColor: '#cbd5e1',
+              borderRadius: [12, 0]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '80%',
+            rotation: -90,
+            circumference: 180,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false }
+            }
+          }
+        });
+      }
+
+      // 2. Trend Line Chart
+      const ctxTrend = document.getElementById('trendChart');
+      if (ctxTrend) {
+        const gradient = ctxTrend.getContext('2d').createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+        charts.trend = new Chart(ctxTrend.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Dec'],
+            datasets: [{
+              label: 'Transparency Score',
+              data: [15, 38, 32, 50, 55, 62, 75, 92],
+              borderColor: '#3b82f6',
+              borderWidth: 3,
+              backgroundColor: gradient,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#ffffff',
+              pointBorderColor: '#cbd5e1',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: {
+                grid: { display: false }
+              },
+              y: {
+                min: 0,
+                max: 100,
+                ticks: {
+                  stepSize: 25
+                },
+                grid: { color: '#cbd5e1' }
+              }
+            }
+          }
+        });
+      }
+
+      // 3. Budget Allocation Donut Chart
+      const ctxBudget = document.getElementById('budgetDonutCanvas');
+      if (ctxBudget) {
+        charts.budget = new Chart(ctxBudget.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Road Repairs', 'Drainage Work', 'Street Lights', 'Smart Sensors', 'Emergency Fund'],
+            datasets: [{
+              data: [40, 25, 15, 10, 10],
+              backgroundColor: ['#3b82f6', '#0ea5e9', '#6366f1', '#a855f7', '#10b981'],
+              borderWidth: 2,
+              borderColor: '#cbd5e1'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  boxWidth: 12,
+                  font: { size: 12, weight: 600 }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 4. Maintenance History Bar Chart
+      const ctxHistory = document.getElementById('historyChart');
+      if (ctxHistory) {
+        charts.history = new Chart(ctxHistory.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['2022', '2023', '2024', '2025', '2026'],
+            datasets: [{
+              label: 'Total Completed Repairs',
+              data: [120, 210, 290, 380, 438],
+              backgroundColor: '#3b82f6',
+              borderRadius: 6,
+              borderWidth: 2,
+              borderColor: '#cbd5e1'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: { grid: { display: false } },
+              y: { grid: { color: '#cbd5e1' } }
+            }
+          }
+        });
+      }
+
+      // 5. Budget Analytics - Spend Trend Compare
+      const ctxSpend = document.getElementById('analyticsSpendCanvas');
+      if (ctxSpend) {
+        charts.spend = new Chart(ctxSpend.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [
+              {
+                label: 'Allocated Budget ($k)',
+                data: [400, 450, 420, 500, 480, 600],
+                backgroundColor: '#cbd5e1',
+                borderRadius: 4,
+                borderWidth: 2,
+                borderColor: '#cbd5e1'
+              },
+              {
+                label: 'Actual Spending ($k)',
+                data: [380, 420, 410, 520, 460, 580],
+                backgroundColor: '#3b82f6',
+                borderRadius: 4,
+                borderWidth: 2,
+                borderColor: '#cbd5e1'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { grid: { display: false } },
+              y: { grid: { color: '#cbd5e1' } }
+            }
+          }
+        });
+      }
+
+      // 6. Budget Analytics - Radar Chart
+      const ctxZone = document.getElementById('analyticsZoneCanvas');
+      if (ctxZone) {
+        charts.zone = new Chart(ctxZone.getContext('2d'), {
+          type: 'radar',
+          data: {
+            labels: ['Anna Nagar', 'OMR', 'Velachery', 'Tambaram', 'T Nagar'],
+            datasets: [{
+              label: 'Efficiency Index',
+              data: [94, 88, 82, 75, 95],
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              borderColor: '#3b82f6',
+              pointBackgroundColor: '#3b82f6',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+      }
+    }
+
+    // Handle interactive before/after image slider
+    function initImageSlider() {
+      const sliderControl = document.getElementById('slider-control');
+      const sliderBefore = document.getElementById('slider-before-img');
+      const sliderHandle = document.getElementById('slider-divider-handle');
+
+      if (sliderControl && sliderBefore && sliderHandle) {
+        sliderControl.addEventListener('input', (e) => {
+          const val = e.target.value;
+          sliderBefore.style.width = `${val}%`;
+          sliderHandle.style.left = `${val}%`;
+        });
+      }
+    }
+
+    // Dynamic section switcher logic
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize all charts and slider elements
+      initAllCharts();
+      initImageSlider();
+
+      const sidebarItems = document.querySelectorAll('.sidebar-item');
+      const sections = document.querySelectorAll('.workspace-section');
+      
+      const pageTitle = document.getElementById('page-content-title');
+      const pageSubtitle = document.getElementById('page-content-subtitle');
+
+      const titleMap = {
+        'content-transparency-score': {
+          title: 'Transparency',
+          subtitle: 'Monitor public accountability metrics, track budget utilization, analyze infrastructure performance and maintain public transparency across Chennai.'
+        },
+        'content-budget-overview': {
+          title: 'Budget Overview',
+          subtitle: 'Verify allocated public funds, audit spent capital pipelines, monitor emergency funds, and detect suspicious transactions across Chennai road projects.'
+        },
+        'content-repair-tracking': {
+          title: 'Repair Tracking',
+          subtitle: 'Audit live infrastructure repairs, inspect active potholes, track project SLA timelines, and review automatic AI sensor anomalies.'
+        },
+        'content-maintenance-history': {
+          title: 'Maintenance History',
+          subtitle: 'Review historical road maintenance logs, study recurring asphalt damages, monitor contractor compliance ratings, and review AI suggestions.'
+        },
+        'content-budget-analytics': {
+          title: 'Budget Analytics',
+          subtitle: 'Conduct predictive cost efficiency modelling, compare zone spending margins, audit contractor financial records, and detect waste.'
+        },
+        'content-completed-projects': {
+          title: 'Completed Projects',
+          subtitle: 'Review successfully completed road works, browse citizen satisfaction surveys, audit finished asset files, and review visual sliders.'
+        }
+      };
+
+      sidebarItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          const sectionId = item.getAttribute('data-section');
+          
+          // Switch active class on sidebar items
+          sidebarItems.forEach(sib => sib.classList.remove('active'));
+          item.classList.add('active');
+
+          // Switch active class on workspace sections
+          sections.forEach(sec => sec.classList.remove('active'));
+          const targetSection = document.getElementById(sectionId);
+          if (targetSection) {
+            targetSection.classList.add('active');
+          }
+
+          // Update header card titles
+          if (titleMap[sectionId]) {
+            pageTitle.textContent = titleMap[sectionId].title;
+            pageSubtitle.textContent = titleMap[sectionId].subtitle;
+          }
+
+          // Force chart render resizing to prevent layout shifting
+          Object.keys(charts).forEach(key => {
+            charts[key].resize();
+            charts[key].update();
+          });
+        });
+      });
+
+      // ----------------------------------------------------
+      // Profile Dropdown & Logout Flow Logic
+      // ----------------------------------------------------
+      const profileTrigger = document.getElementById('profile-dropdown-trigger');
+      const profileDropdown = document.getElementById('profile-dropdown');
+      const logoutTrigger = document.getElementById('logout-trigger');
+      const logoutModalOverlay = document.getElementById('logout-modal-overlay');
+      const logoutModal = document.getElementById('logout-modal');
+      const logoutCancelBtn = document.getElementById('logout-cancel-btn');
+      const logoutConfirmBtn = document.getElementById('logout-confirm-btn');
+
+      // Toggle dropdown on click
+      if (profileTrigger && profileDropdown) {
+          profileTrigger.addEventListener('click', (e) => {
+              e.stopPropagation();
+              profileDropdown.classList.toggle('show');
+          });
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', () => {
+          if (profileDropdown && profileDropdown.classList.contains('show')) {
+              profileDropdown.classList.remove('show');
+          }
+      });
+
+      // Prevent dropdown click from closing it
+      if (profileDropdown) {
+          profileDropdown.addEventListener('click', (e) => {
+              e.stopPropagation();
+          });
+      }
+
+      // Open logout modal
+      if (logoutTrigger) {
+          logoutTrigger.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (profileDropdown) profileDropdown.classList.remove('show');
+              if (logoutModalOverlay) logoutModalOverlay.classList.add('show');
+              if (logoutModal) logoutModal.classList.add('show');
+          });
+      }
+
+      // Close logout modal (Cancel)
+      const closeLogoutModal = () => {
+          if (logoutModalOverlay) logoutModalOverlay.classList.remove('show');
+          if (logoutModal) logoutModal.classList.remove('show');
+      };
+
+      if (logoutCancelBtn) {
+          logoutCancelBtn.addEventListener('click', closeLogoutModal);
+      }
+      if (logoutModalOverlay) {
+          logoutModalOverlay.addEventListener('click', closeLogoutModal);
+      }
+
+      // Confirm Logout action
+      if (logoutConfirmBtn) {
+          logoutConfirmBtn.addEventListener('click', () => {
+              logoutConfirmBtn.textContent = 'Logging out...';
+              setTimeout(() => {
+                  alert('You have successfully logged out.');
+                  closeLogoutModal();
+              }, 1000);
+          });
+      }
+    });
+  </script>
+
+  <!-- Logout Confirmation Popup -->
+  <div id="logout-modal-overlay" class="modal-overlay"></div>
+  <div id="logout-modal" class="logout-modal">
+      <div class="logout-warning-icon">⚠️</div>
+      <h3>Confirm Logout</h3>
+      <p>Are you sure you want to logout of RoadLens?</p>
+      <div class="logout-modal-buttons">
+          <button id="logout-cancel-btn" class="modal-btn btn-cancel">Cancel</button>
+          <button id="logout-confirm-btn" class="modal-btn btn-logout">Logout</button>
+      </div>
+  </div>
+</body>
+</html>

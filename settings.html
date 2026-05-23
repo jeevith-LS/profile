@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadLens - Safety & Privacy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-light: #e0f2fe;
+            --primary-dark: #0369a1;
+            --secondary: #3b82f6;
+            --bg-color: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f9ff;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%230ea5e9' fill-opacity='0.15'/%3E%3C/svg%3E"),
+                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 60%),
+                radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(52, 211, 153, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(129, 140, 248, 0.12) 0px, transparent 50%);
+            background-size: 40px 40px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            animation: bgFloat 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgFloat {
+            0% { background-position: 0 0, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+            100% { background-position: 20px 20px, 5% 5%, -5% 5%, 5% -5%, -5% -5%; }
+        }
+
+        /* Abstract glowing blobs via pseudo-elements */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -2;
+            pointer-events: none;
+            animation: blobFloat 20s infinite alternate ease-in-out;
+        }
+
+        body::before {
+            width: 60vw;
+            height: 60vw;
+            background: rgba(56, 189, 248, 0.12);
+            top: -20vh;
+            left: -10vw;
+        }
+
+        body::after {
+            width: 70vw;
+            height: 70vw;
+            background: rgba(14, 165, 233, 0.08);
+            bottom: -20vh;
+            right: -10vw;
+            animation-delay: -10s;
+        }
+
+        @keyframes blobFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5vw, 5vh) scale(1.1); }
+        }
+
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Glassmorphism floating shapes in background */
+        .main-content::before, .main-content::after {
+            content: '';
+            position: fixed;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: -1;
+            pointer-events: none;
+            animation: shapeFloat 25s infinite alternate ease-in-out;
+        }
+
+        .main-content::before {
+            width: 350px;
+            height: 350px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%);
+            top: 15%;
+            left: -150px;
+            transform: rotate(45deg);
+        }
+
+        .main-content::after {
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -12.5s;
+        }
+
+        @keyframes shapeFloat {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            100% { transform: translateY(-80px) rotate(20deg) scale(1.05); }
+        }
+
+        /* Top Header */
+        .header {
+            background-color: var(--card-bg);
+            padding: 1.25rem 2.5rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .horizontal-tabs {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .tab {
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            padding-bottom: 0.5rem;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1.25rem;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .timestamp {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .timestamp::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Profile Dropdown Menu */
+        .profile-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 250px;
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            padding: 8px 0;
+            animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top right;
+        }
+
+        .profile-dropdown.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+        }
+
+        .dropdown-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid var(--border-color);
+        }
+
+        .dropdown-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dropdown-user-info .user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .dropdown-user-info .user-role {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .dropdown-divider {
+            height: 1.5px;
+            background-color: var(--border-color);
+            margin: 6px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .dropdown-item .dropdown-icon {
+            font-size: 16px;
+        }
+
+        .dropdown-item.logout-item {
+            color: var(--danger);
+        }
+
+        .dropdown-item.logout-item:hover {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* Container */
+        .container {
+            padding: 2.5rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Container shadow for deep glow depth */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 4rem; left: 4rem; right: 4rem; bottom: 4rem;
+            background: transparent;
+            box-shadow: 0 0 120px 30px rgba(14, 165, 233, 0.08);
+            border-radius: 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .page-title {
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Settings Grid Layout */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card panels */
+        .settings-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.05), 0 8px 10px -6px rgba(14, 165, 233, 0.03);
+            border: 2px solid var(--border-color);
+            border-left: 5px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            height: fit-content;
+            background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+            overflow: hidden;
+        }
+
+        .settings-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            border-bottom: 1.5px solid var(--border-color);
+            padding: 1rem 2rem;
+            margin: -2rem -2rem 0.5rem -2rem;
+            background: linear-gradient(to right, #e0f2fe, #f0f9ff, #ffffff);
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form Group */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            background-color: #fafcfe;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background-color: #ffffff;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid var(--border-color);
+            text-align: center;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+        }
+
+        .btn-outline {
+            background-color: #ffffff;
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border-color: #cbd5e1;
+        }
+
+        /* 2FA OTP Fields */
+        .otp-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 0.5rem 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            text-align: center;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .otp-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .info-text {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Login Activity List */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-color);
+            background-color: #f8fafc;
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .device-icon {
+            font-size: 20px;
+        }
+
+        .device-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .device-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .device-location {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .activity-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-active {
+            background-color: #d1fae5;
+            color: #10b981;
+        }
+
+        /* Switches / Toggles */
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Options grid for Privacy */
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .option-item input[type="checkbox"] {
+            margin-top: 4px;
+            cursor: pointer;
+        }
+
+        .option-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .option-desc {
+            font-size: 11.5px;
+            color: var(--text-light);
+            line-height: 1.3;
+        }
+
+        /* Selection menu styles */
+        .select-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            background-color: #ffffff;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Danger Zone Card */
+        .settings-card.card-danger {
+            border-color: var(--danger) !important;
+            border-left: 5px solid var(--danger) !important;
+            background-color: #fffbfb;
+            background: linear-gradient(180deg, #fffbfb 0%, #fff5f5 100%);
+        }
+
+        .danger-msg {
+            font-size: 13px;
+            color: #7f1d1d;
+            line-height: 1.4;
+        }
+
+        /* Modal Overlay and Popup style */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            animation: fadeInOverlay 0.2s ease-out;
+        }
+
+        .modal-overlay.show {
+            display: block;
+        }
+
+        .logout-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 90%;
+            max-width: 400px;
+            background-color: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            z-index: 2001;
+            display: none;
+            padding: 32px 24px;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.2s ease-out;
+        }
+
+        .logout-modal.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .logout-warning-icon {
+            font-size: 44px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .logout-modal h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .logout-modal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .logout-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-cancel {
+            background-color: #ffffff;
+            color: var(--text-secondary);
+        }
+
+        .btn-cancel:hover {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border-color: #cbd5e1;
+        }
+
+        .btn-logout {
+            background-color: var(--danger);
+            color: #ffffff;
+            border-color: var(--danger);
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        /* Toast feedback alerts */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ffffff;
+            border: 2px solid var(--success);
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: var(--success);
+            font-size: 20px;
+        }
+
+        .toast-msg {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <div class="horizontal-tabs">
+                <div class="tab" onclick="window.location.href='profile.html'">Account Center</div>
+                <div class="tab active">Safety & Privacy</div>
+            </div>
+            <div class="header-actions" style="position: relative;">
+                <div class="timestamp">
+                    Data last updated: <span id="current-time">Today, 14:30 PM</span>
+                </div>
+                <div id="profile-dropdown-trigger" style="width: 44px; height: 44px; border-radius: 50%; background: var(--bg-color); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer;">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=0ea5e9&color=fff&bold=true" alt="User Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+
+                <!-- PROFILE DROPDOWN MENU -->
+                <div id="profile-dropdown" class="profile-dropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-avatar">AU</div>
+                        <div class="dropdown-user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">System Administrator</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="profile.html" class="dropdown-item">
+                        <span class="dropdown-icon">👤</span>
+                        <span>Profile Information</span>
+                    </a>
+                    <a href="settings.html" class="dropdown-item">
+                        <span class="dropdown-icon">⚙️</span>
+                        <span>Safety & Privacy</span>
+                    </a>
+                    <a href="notification.html" class="dropdown-item">
+                        <span class="dropdown-icon">🔔</span>
+                        <span>Notifications</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="logout-trigger" class="dropdown-item logout-item">
+                        <span class="dropdown-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <h1 class="page-title">Safety & Privacy Settings</h1>
+
+            <div class="settings-grid">
+                
+                <!-- 1. CHANGE PASSWORD -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h2>🔒 Change Password</h2>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="curr-password">Current Password</label>
+                        <input class="form-input" type="password" id="curr-password" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="new-password">New Password</label>
+                        <input class="form-input" type="password" id="new-password" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="conf-password">Confirm Password</label>
+                        <input class="form-input" type="password" id="conf-password" placeholder="••••••••">
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-outline" id="btn-verify-pwd">Verify Current</button>
+                        <button class="btn btn-primary" id="btn-update-pwd">Update Password</button>
+                    </div>
+                </div>
+
+                <!-- 2. TWO-FACTOR AUTHENTICATION -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h2>📱 Two-Factor Authentication</h2>
+                    </div>
+                    <p class="form-label" style="line-height: 1.4;">Enter the 4-digit code sent to your registered mobile number:</p>
+                    <div class="otp-container">
+                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveNext(this, 'otp-2')">
+                        <input type="text" class="otp-input" id="otp-2" maxlength="1" onkeyup="moveNext(this, 'otp-3')">
+                        <input type="text" class="otp-input" id="otp-3" maxlength="1" onkeyup="moveNext(this, 'otp-4')">
+                        <input type="text" class="otp-input" id="otp-4" maxlength="1">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" id="btn-verify-otp">Verify OTP</button>
+                    <div class="info-text">
+                        2FA adds an extra layer of protection to secure citizen records, financial data, and credentials.
+                    </div>
+                </div>
+
+                <!-- 3. LOGIN ACTIVITY -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h2>🖥️ Login Activity</h2>
+                    </div>
+                    <div class="activity-list">
+                        <!-- macOS -->
+                        <div class="activity-item">
+                            <div class="device-info">
+                                <span class="device-icon">💻</span>
+                                <div class="device-details">
+                                    <span class="device-name">MacOS Chrome</span>
+                                    <span class="device-location">Chennai, India</span>
+                                </div>
+                            </div>
+                            <div class="activity-meta">
+                                <span class="timestamp">Today, 16:25 PM</span>
+                                <span class="status-badge badge-active">Active</span>
+                            </div>
+                        </div>
+                        <!-- iPhone -->
+                        <div class="activity-item">
+                            <div class="device-info">
+                                <span class="device-icon">📱</span>
+                                <div class="device-details">
+                                    <span class="device-name">iPhone Safari</span>
+                                    <span class="device-location">Chennai, India</span>
+                                </div>
+                            </div>
+                            <div class="activity-meta">
+                                <span class="timestamp">Yesterday, 11:42 AM</span>
+                            </div>
+                        </div>
+                        <!-- Windows -->
+                        <div class="activity-item">
+                            <div class="device-info">
+                                <span class="device-icon">🖥️</span>
+                                <div class="device-details">
+                                    <span class="device-name">Windows Edge</span>
+                                    <span class="device-location">Bangalore, India</span>
+                                </div>
+                            </div>
+                            <div class="activity-meta">
+                                <span class="timestamp">18 May, 09:15 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. NOTIFICATION SETTINGS -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h2>🔔 Notification Settings</h2>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Email Notifications</span>
+                        <label class="switch">
+                            <input type="checkbox" checked id="toggle-email">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">SMS Alerts</span>
+                        <label class="switch">
+                            <input type="checkbox" checked id="toggle-sms">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Complaint Updates</span>
+                        <label class="switch">
+                            <input type="checkbox" checked id="toggle-complaints">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Maintenance Alerts</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-maintenance">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Emergency Warnings</span>
+                        <label class="switch">
+                            <input type="checkbox" checked id="toggle-emergency">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 5. PRIVACY SETTINGS -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h2>👁️ Privacy Settings</h2>
+                    </div>
+                    <label class="option-item">
+                        <input type="checkbox" checked id="chk-public-profile">
+                        <div class="option-details">
+                            <span class="option-title">Public Profile Visibility</span>
+                            <span class="option-desc">Allow public lookup of city-wide administrative trust index.</span>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="chk-aadhaar-vis">
+                        <div class="option-details">
+                            <span class="option-title">Aadhaar Visibility</span>
+                            <span class="option-desc">Display masked Aadhaar reference in accountability logs.</span>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" checked id="chk-data-share">
+                        <div class="option-details">
+                            <span class="option-title">Data Sharing Permissions</span>
+                            <span class="option-desc">Allow road monitoring statistics to feed third-party traffic APIs.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- 6. ACCOUNT PREFERENCES -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h2>🎨 Account Preferences</h2>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Dark Mode Toggle</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-dark-mode">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="select-lang">Language Selection</label>
+                        <select class="select-input" id="select-lang">
+                            <option value="en">English (US)</option>
+                            <option value="ta">Tamil (தமிழ்)</option>
+                            <option value="hi">Hindi (हिन्दी)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="select-region">Region Selection</label>
+                        <select class="select-input" id="select-region">
+                            <option value="chennai">Chennai (Metropolitan)</option>
+                            <option value="bangalore">Bangalore</option>
+                            <option value="mumbai">Mumbai</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 7. DELETE ACCOUNT -->
+                <div class="settings-card card-danger full-width">
+                    <div class="card-header" style="border-color: #fca5a5;">
+                        <h2 style="color: var(--danger);">⚠️ Danger Zone - Delete Account</h2>
+                    </div>
+                    <p class="danger-msg">
+                        Warning: Deleting your account will revoke all administrative credentials, wipe saved compliance records, and log you out immediately. This action is permanent and cannot be undone.
+                    </p>
+                    <button class="btn btn-danger" style="align-self: flex-start; background-color: var(--danger); color: white; border-color: var(--danger);" id="btn-delete-acc">Delete Account</button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast-success">
+        <span class="toast-icon">✓</span>
+        <span class="toast-msg" id="toast-msg-text">Preferences updated successfully!</span>
+    </div>
+
+    <!-- Logout Confirmation Popup -->
+    <div id="logout-modal-overlay" class="modal-overlay"></div>
+    <div id="logout-modal" class="logout-modal">
+        <div class="logout-warning-icon">⚠️</div>
+        <h3>Confirm Logout</h3>
+        <p>Are you sure you want to logout of RoadLens?</p>
+        <div class="logout-modal-buttons">
+            <button id="logout-cancel-btn" class="modal-btn btn-cancel">Cancel</button>
+            <button id="logout-confirm-btn" class="modal-btn btn-logout">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Set current time
+        const now = new Date();
+        document.getElementById('current-time').textContent = now.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+
+        // Elements
+        const profileTrigger = document.getElementById('profile-dropdown-trigger');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const logoutTrigger = document.getElementById('logout-trigger');
+        const logoutModalOverlay = document.getElementById('logout-modal-overlay');
+        const logoutModal = document.getElementById('logout-modal');
+        const logoutCancelBtn = document.getElementById('logout-cancel-btn');
+        const logoutConfirmBtn = document.getElementById('logout-confirm-btn');
+
+        // Dropdown actions
+        if (profileTrigger && profileDropdown) {
+            profileTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+        }
+
+        document.addEventListener('click', () => {
+            if (profileDropdown && profileDropdown.classList.contains('show')) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+
+        if (profileDropdown) {
+            profileDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Open logout modal
+        if (logoutTrigger) {
+            logoutTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (profileDropdown) profileDropdown.classList.remove('show');
+                if (logoutModalOverlay) logoutModalOverlay.classList.add('show');
+                if (logoutModal) logoutModal.classList.add('show');
+            });
+        }
+
+        // Close logout modal
+        const closeLogoutModal = () => {
+            if (logoutModalOverlay) logoutModalOverlay.classList.remove('show');
+            if (logoutModal) logoutModal.classList.remove('show');
+        };
+
+        if (logoutCancelBtn) logoutCancelBtn.addEventListener('click', closeLogoutModal);
+        if (logoutModalOverlay) logoutModalOverlay.addEventListener('click', closeLogoutModal);
+
+        if (logoutConfirmBtn) {
+            logoutConfirmBtn.addEventListener('click', () => {
+                logoutConfirmBtn.textContent = 'Logging out...';
+                setTimeout(() => {
+                    alert('You have successfully logged out.');
+                    closeLogoutModal();
+                }, 1000);
+            });
+        }
+
+        // OTP navigation helper
+        function moveNext(current, nextInputId) {
+            if (current.value.length === 1) {
+                const nextInput = document.getElementById(nextInputId);
+                if (nextInput) nextInput.focus();
+            }
+        }
+
+        // Toast feedback alerts
+        const toast = document.getElementById('toast-success');
+        const toastMsg = document.getElementById('toast-msg-text');
+        
+        const showToast = (message, isSuccess = true) => {
+            toastMsg.textContent = message;
+            toast.style.borderColor = isSuccess ? 'var(--success)' : 'var(--danger)';
+            const icon = toast.querySelector('.toast-icon');
+            icon.textContent = isSuccess ? '✓' : '⚠️';
+            icon.style.color = isSuccess ? 'var(--success)' : 'var(--danger)';
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        // Actions hooks
+        document.getElementById('btn-verify-pwd').addEventListener('click', () => {
+            showToast('Current password verified successfully!');
+        });
+
+        document.getElementById('btn-update-pwd').addEventListener('click', () => {
+            const newPwd = document.getElementById('new-password').value;
+            const confPwd = document.getElementById('conf-password').value;
+            if (!newPwd || !confPwd) {
+                showToast('Please fill out all password fields.', false);
+            } else if (newPwd !== confPwd) {
+                showToast('Passwords do not match.', false);
+            } else {
+                showToast('Password updated successfully!');
+            }
+        });
+
+        document.getElementById('btn-verify-otp').addEventListener('click', () => {
+            showToast('2FA verification complete.');
+        });
+
+        // Toggle triggers
+        const setupToggle = (elementId, labelText) => {
+            const toggle = document.getElementById(elementId);
+            if (toggle) {
+                toggle.addEventListener('change', () => {
+                    showToast(`${labelText} ${toggle.checked ? 'enabled' : 'disabled'}`);
+                });
+            }
+        };
+
+        setupToggle('toggle-email', 'Email notifications');
+        setupToggle('toggle-sms', 'SMS alerts');
+        setupToggle('toggle-complaints', 'Complaint alerts');
+        setupToggle('toggle-maintenance', 'Maintenance alerts');
+        setupToggle('toggle-emergency', 'Emergency alerts');
+        setupToggle('toggle-dark-mode', 'Dark mode');
+
+        document.getElementById('select-lang').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const map = { en: 'English', ta: 'Tamil', hi: 'Hindi' };
+            showToast(`Language set to ${map[val]}`);
+        });
+
+        document.getElementById('select-region').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const map = { chennai: 'Chennai', bangalore: 'Bangalore', mumbai: 'Mumbai' };
+            showToast(`Region set to ${map[val]}`);
+        });
+
+        document.getElementById('btn-delete-acc').addEventListener('click', () => {
+            const check = confirm('Are you sure you want to permanently delete your RoadLens account?');
+            if (check) {
+                alert('Simulated deletion: Account deleted.');
+            }
+        });
+
+    </script>
+</body>
+</html>

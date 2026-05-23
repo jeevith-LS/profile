@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RoadWatch AI smart-city analytics dashboard for road infrastructure monitoring, predictive analytics, repairs tracking, and critical risk assessment.">
+    <title>RoadWatch AI - Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="analytics.css">
+</head>
+<body>
+
+    <div class="standalone-container">
+        
+        <header class="page-header">
+            <h1><i class="fa-solid fa-road"></i> RoadWatch AI Analytics</h1>
+            <p>Smart-city road infrastructure insights and predictive monitoring</p>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <!-- Left Side Main Graph & Feed Section -->
+            <div class="left-column">
+                
+                <!-- Reports Analytics (Graph Section) -->
+                <section class="analytics-section reports-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-chart-line"></i> Reports Analytics</h2>
+                        <div class="time-tabs">
+                            <button class="tab-btn active" data-period="daily">Daily Report</button>
+                            <button class="tab-btn" data-period="weekly">Weekly Report</button>
+                            <button class="tab-btn" data-period="monthly">Monthly Report</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="pulseChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Bottom Left Feed Section -->
+                <section class="analytics-section live-feed-section">
+                    <div class="section-header" style="margin-bottom: 12px;">
+                        <h2><i class="fa-solid fa-satellite-dish"></i> Critical Roads Live Feed</h2>
+                    </div>
+                    <div class="feed-subtitle" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;">Top 10 Most Complained Roads & Areas in Chennai</div>
+                    
+                    <div class="live-feed-list" id="live-feed-list">
+                        <!-- Feed items will be injected by JS -->
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Right Side Analytics Panels & Export Section -->
+            <div class="right-column">
+                
+                <!-- Stacked Analytics Cards -->
+                <div class="stats-stack">
+                    <div class="stat-card">
+                        <span class="stat-title">Complaints</span>
+                        <div class="stat-wrapper">
+                            <span class="stat-value" id="val-complaints">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Repairs</span>
+                        <div class="stat-wrapper">
+                            <span class="stat-value" id="val-repairs">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">High Risk Zones</span>
+                        <div class="stat-wrapper">
+                            <span class="stat-value" id="val-risk">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Repair Success Rate</span>
+                        <div class="stat-wrapper">
+                            <span class="stat-value" id="val-success">0</span><span class="stat-suffix">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <section class="analytics-section export-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-file-export"></i> Export Options</h2>
+                    </div>
+                    
+                    <div class="export-actions">
+                        <div class="export-group">
+                            <p class="export-label">Download Reports</p>
+                            <div class="btn-row">
+                                <button class="export-btn glow-hover">
+                                    <i class="fa-solid fa-file-pdf"></i> PDF
+                                </button>
+                                <button class="export-btn glow-hover">
+                                    <i class="fa-solid fa-file-csv"></i> CSV
+                                </button>
+                            </div>
+                        </div>
+                        <div class="export-group">
+                            <p class="export-label">Share</p>
+                            <button class="export-btn glow-hover">
+                                <i class="fa-solid fa-share-nodes"></i> Share Summary
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Share Summary Modal -->
+    <div class="share-modal-overlay" id="shareModalOverlay"></div>
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal-header">
+            <div class="drag-handle"></div>
+            <h3>Share</h3>
+            <button class="close-share" id="closeShareBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="share-icons-container">
+            <div class="share-icon-wrapper">
+                <div class="share-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
+                <span>WhatsApp</span>
+            </div>
+            <div class="share-icon-wrapper">
+                <div class="share-icon messages"><i class="fa-solid fa-comment"></i></div>
+                <span>Messages</span>
+            </div>
+            <div class="share-icon-wrapper">
+                <div class="share-icon facebook"><i class="fa-brands fa-facebook-f"></i></div>
+                <span>Facebook</span>
+            </div>
+            <div class="share-icon-wrapper">
+                <div class="share-icon twitter"><i class="fa-brands fa-x-twitter"></i></div>
+                <span>X</span>
+            </div>
+            <div class="share-icon-wrapper">
+                <div class="share-icon telegram"><i class="fa-brands fa-telegram"></i></div>
+                <span>Telegram</span>
+            </div>
+            <div class="share-icon-wrapper">
+                <div class="share-icon instagram"><i class="fa-brands fa-instagram"></i></div>
+                <span>Instagram</span>
+            </div>
+            <div class="share-icon-wrapper">
+                <div class="share-icon email"><i class="fa-solid fa-envelope"></i></div>
+                <span>Email</span>
+            </div>
+        </div>
+
+        <div class="copy-link-section">
+            <div class="copy-link-container">
+                <input type="text" value="https://roadwatch-ai/analytics-report" readonly class="copy-link-input" id="shareLinkInput">
+                <button class="copy-link-btn" id="copyLinkBtn">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="analytics.js"></script>
+</body>
+</html>

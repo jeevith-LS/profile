@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadLens - Account Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-light: #e0f2fe;
+            --primary-dark: #0369a1;
+            --secondary: #3b82f6;
+            --bg-color: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f9ff;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%230ea5e9' fill-opacity='0.15'/%3E%3C/svg%3E"),
+                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 60%),
+                radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(52, 211, 153, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(129, 140, 248, 0.12) 0px, transparent 50%);
+            background-size: 40px 40px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            animation: bgFloat 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgFloat {
+            0% { background-position: 0 0, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+            100% { background-position: 20px 20px, 5% 5%, -5% 5%, 5% -5%, -5% -5%; }
+        }
+
+        /* Abstract glowing blobs via pseudo-elements */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -2;
+            pointer-events: none;
+            animation: blobFloat 20s infinite alternate ease-in-out;
+        }
+
+        body::before {
+            width: 60vw;
+            height: 60vw;
+            background: rgba(56, 189, 248, 0.12);
+            top: -20vh;
+            left: -10vw;
+        }
+
+        body::after {
+            width: 70vw;
+            height: 70vw;
+            background: rgba(14, 165, 233, 0.08);
+            bottom: -20vh;
+            right: -10vw;
+            animation-delay: -10s;
+        }
+
+        @keyframes blobFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5vw, 5vh) scale(1.1); }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Glassmorphism floating shapes in background */
+        .main-content::before, .main-content::after {
+            content: '';
+            position: fixed;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: -1;
+            pointer-events: none;
+            animation: shapeFloat 25s infinite alternate ease-in-out;
+        }
+
+        .main-content::before {
+            width: 350px;
+            height: 350px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%);
+            top: 15%;
+            left: -150px;
+            transform: rotate(45deg);
+        }
+
+        .main-content::after {
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -12.5s;
+        }
+
+        @keyframes shapeFloat {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            100% { transform: translateY(-80px) rotate(20deg) scale(1.05); }
+        }
+
+        /* Top Header */
+        .header {
+            background-color: var(--card-bg);
+            padding: 1.25rem 2.5rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .horizontal-tabs {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .tab {
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            padding-bottom: 0.5rem;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1.25rem;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .timestamp {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .timestamp::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Profile Dropdown Menu */
+        .profile-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 250px;
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            padding: 8px 0;
+            animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top right;
+        }
+
+        .profile-dropdown.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+        }
+
+        .dropdown-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid var(--border-color);
+        }
+
+        .dropdown-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dropdown-user-info .user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .dropdown-user-info .user-role {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .dropdown-divider {
+            height: 1.5px;
+            background-color: var(--border-color);
+            margin: 6px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .dropdown-item .dropdown-icon {
+            font-size: 16px;
+        }
+
+        .dropdown-item.logout-item {
+            color: var(--danger);
+        }
+
+        .dropdown-item.logout-item:hover {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* Container */
+        .container {
+            padding: 2.5rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Container shadow for deep glow depth */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 4rem; left: 4rem; right: 4rem; bottom: 4rem;
+            background: transparent;
+            box-shadow: 0 0 120px 30px rgba(14, 165, 233, 0.08);
+            border-radius: 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .page-title {
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Profile Layout */
+        .profile-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.05), 0 8px 10px -6px rgba(14, 165, 233, 0.03);
+            border: 2px solid var(--border-color);
+            border-left: 6px solid var(--primary);
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+        }
+
+        @media (max-width: 900px) {
+            .profile-card {
+                flex-direction: column;
+                gap: 2rem;
+            }
+        }
+
+        /* Profile Image Section */
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+            flex-shrink: 0;
+            background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid rgba(14, 165, 233, 0.25);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .avatar-wrapper {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            padding: 4px;
+            position: relative;
+            background: #ffffff;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .avatar-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid var(--border-color);
+            text-align: center;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+        }
+
+        .btn-outline {
+            background-color: #ffffff;
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            background-color: #ffffff;
+            color: var(--danger);
+            border-color: #fca5a5;
+        }
+
+        .btn-danger:hover {
+            background-color: #fee2e2;
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* Change Photo Popover Menu */
+        .photo-popover {
+            position: absolute;
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            padding: 6px 0;
+            z-index: 20;
+            width: 180px;
+            display: none;
+            flex-direction: column;
+            transform-origin: top center;
+            animation: popoverFade 0.2s ease;
+        }
+
+        .photo-popover.show {
+            display: flex;
+        }
+
+        @keyframes popoverFade {
+            from { opacity: 0; transform: scale(0.95) translateY(-5px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .popover-item {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .popover-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        /* Form Styling */
+        .profile-form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            background-color: #fafcfe;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background-color: #ffffff;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-light);
+        }
+
+        /* Modal Alerts overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            animation: fadeInOverlay 0.2s ease-out;
+        }
+
+        .modal-overlay.show {
+            display: block;
+        }
+
+        .logout-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 90%;
+            max-width: 400px;
+            background-color: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            z-index: 2001;
+            display: none;
+            padding: 32px 24px;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.2s ease-out;
+        }
+
+        .logout-modal.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logout-warning-icon {
+            font-size: 44px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .logout-modal h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .logout-modal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .logout-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-cancel {
+            background-color: #ffffff;
+            color: var(--text-secondary);
+        }
+
+        .btn-cancel:hover {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border-color: #cbd5e1;
+        }
+
+        .btn-logout {
+            background-color: var(--danger);
+            color: #ffffff;
+            border-color: var(--danger);
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        /* Alerts notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ffffff;
+            border: 2px solid var(--success);
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: var(--success);
+            font-size: 20px;
+        }
+
+        .toast-msg {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <div class="horizontal-tabs">
+                <div class="tab active">Account Center</div>
+                <div class="tab" onclick="window.location.href='settings.html'">Safety & Privacy</div>
+            </div>
+            <div class="header-actions" style="position: relative;">
+                <div class="timestamp">
+                    Data last updated: <span id="current-time">Today, 14:30 PM</span>
+                </div>
+                <div id="profile-dropdown-trigger" style="width: 44px; height: 44px; border-radius: 50%; background: var(--bg-color); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer;">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=0ea5e9&color=fff&bold=true" alt="User Profile" id="top-bar-avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+
+                <!-- PROFILE DROPDOWN MENU -->
+                <div id="profile-dropdown" class="profile-dropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-avatar">AU</div>
+                        <div class="dropdown-user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">System Administrator</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="profile.html" class="dropdown-item">
+                        <span class="dropdown-icon">👤</span>
+                        <span>Profile Information</span>
+                    </a>
+                    <a href="settings.html" class="dropdown-item">
+                        <span class="dropdown-icon">⚙️</span>
+                        <span>Safety & Privacy</span>
+                    </a>
+                    <a href="notification.html" class="dropdown-item">
+                        <span class="dropdown-icon">🔔</span>
+                        <span>Notifications</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="logout-trigger" class="dropdown-item logout-item">
+                        <span class="dropdown-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <h1 class="page-title">Account Center - Profile Information</h1>
+
+            <div class="profile-card">
+                <!-- Profile Image Edit Section -->
+                <div class="avatar-section">
+                    <div class="avatar-wrapper">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=0ea5e9&color=fff&bold=true&size=150" alt="User Profile" id="profile-display-img" class="avatar-img">
+                    </div>
+                    <div class="avatar-buttons" style="position: relative;">
+                        <button class="btn btn-primary" id="change-photo-btn">Change Photo</button>
+                        <button class="btn btn-danger" id="delete-photo-btn">Delete Photo</button>
+                        
+                        <!-- Change Photo Choices Popover -->
+                        <div class="photo-popover" id="photo-popover">
+                            <div class="popover-item" id="opt-take-photo">📸 Take New Photo</div>
+                            <div class="popover-item" id="opt-upload-gallery">🖼️ Upload From Gallery</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Info Form -->
+                <form class="profile-form" id="profile-info-form" onsubmit="return false;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="full-name">Full Name</label>
+                            <input class="form-input" type="text" id="full-name" value="Admin User" placeholder="e.g. Jeevith">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="phone-number">Phone Number</label>
+                            <input class="form-input" type="tel" id="phone-number" value="+91 98765 43210" placeholder="+91 XXXXX XXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="email-address">Email Address</label>
+                            <input class="form-input" type="email" id="email-address" value="admin@roadlens.gov.in" placeholder="name@domain.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="aadhaar-number">Aadhaar Number</label>
+                            <input class="form-input" type="text" id="aadhaar-number" value="1234-5678-9012" placeholder="XXXX-XXXX-XXXX">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label" for="emergency-contact">Emergency Contact</label>
+                            <input class="form-input" type="text" id="emergency-contact" value="+91 90000 12345 (Spouse)" placeholder="Name & contact phone number">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="align-self: flex-start; margin-top: 1rem;" id="save-changes-btn">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast-success">
+        <span class="toast-icon">✓</span>
+        <span class="toast-msg" id="toast-msg-text">Changes saved successfully!</span>
+    </div>
+
+    <!-- Logout Confirmation Popup -->
+    <div id="logout-modal-overlay" class="modal-overlay"></div>
+    <div id="logout-modal" class="logout-modal">
+        <div class="logout-warning-icon">⚠️</div>
+        <h3>Confirm Logout</h3>
+        <p>Are you sure you want to logout of RoadLens?</p>
+        <div class="logout-modal-buttons">
+            <button id="logout-cancel-btn" class="modal-btn btn-cancel">Cancel</button>
+            <button id="logout-confirm-btn" class="modal-btn btn-logout">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Set current time
+        const now = new Date();
+        document.getElementById('current-time').textContent = now.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+
+        // Elements
+        const profileTrigger = document.getElementById('profile-dropdown-trigger');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const logoutTrigger = document.getElementById('logout-trigger');
+        const logoutModalOverlay = document.getElementById('logout-modal-overlay');
+        const logoutModal = document.getElementById('logout-modal');
+        const logoutCancelBtn = document.getElementById('logout-cancel-btn');
+        const logoutConfirmBtn = document.getElementById('logout-confirm-btn');
+
+        // Dropdown actions
+        if (profileTrigger && profileDropdown) {
+            profileTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+        }
+
+        document.addEventListener('click', () => {
+            if (profileDropdown && profileDropdown.classList.contains('show')) {
+                profileDropdown.classList.remove('show');
+            }
+            if (photoPopover && photoPopover.classList.contains('show')) {
+                photoPopover.classList.remove('show');
+            }
+        });
+
+        if (profileDropdown) {
+            profileDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Open logout modal
+        if (logoutTrigger) {
+            logoutTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (profileDropdown) profileDropdown.classList.remove('show');
+                if (logoutModalOverlay) logoutModalOverlay.classList.add('show');
+                if (logoutModal) logoutModal.classList.add('show');
+            });
+        }
+
+        // Close logout modal
+        const closeLogoutModal = () => {
+            if (logoutModalOverlay) logoutModalOverlay.classList.remove('show');
+            if (logoutModal) logoutModal.classList.remove('show');
+        };
+
+        if (logoutCancelBtn) logoutCancelBtn.addEventListener('click', closeLogoutModal);
+        if (logoutModalOverlay) logoutModalOverlay.addEventListener('click', closeLogoutModal);
+
+        if (logoutConfirmBtn) {
+            logoutConfirmBtn.addEventListener('click', () => {
+                logoutConfirmBtn.textContent = 'Logging out...';
+                setTimeout(() => {
+                    alert('You have successfully logged out.');
+                    closeLogoutModal();
+                }, 1000);
+            });
+        }
+
+        // Photo Popover logic
+        const changePhotoBtn = document.getElementById('change-photo-btn');
+        const photoPopover = document.getElementById('photo-popover');
+        const deletePhotoBtn = document.getElementById('delete-photo-btn');
+        const profileDisplayImg = document.getElementById('profile-display-img');
+        const topBarAvatar = document.getElementById('top-bar-avatar');
+
+        if (changePhotoBtn && photoPopover) {
+            changePhotoBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                photoPopover.classList.toggle('show');
+            });
+        }
+
+        if (photoPopover) {
+            photoPopover.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Simulating Take Photo and Upload
+        const toast = document.getElementById('toast-success');
+        const toastMsg = document.getElementById('toast-msg-text');
+        
+        const showToast = (message) => {
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        document.getElementById('opt-take-photo').addEventListener('click', () => {
+            photoPopover.classList.remove('show');
+            showToast('Simulating: Opening system camera...');
+        });
+
+        document.getElementById('opt-upload-gallery').addEventListener('click', () => {
+            photoPopover.classList.remove('show');
+            // Simulate photo selection
+            const randomAvatar = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150";
+            profileDisplayImg.src = randomAvatar;
+            topBarAvatar.src = randomAvatar;
+            showToast('New profile photo uploaded!');
+        });
+
+        deletePhotoBtn.addEventListener('click', () => {
+            const placeholder = "https://ui-avatars.com/api/?name=Admin+User&background=cbd5e1&color=475569&bold=true&size=150";
+            profileDisplayImg.src = placeholder;
+            topBarAvatar.src = placeholder;
+            showToast('Profile photo removed.');
+        });
+
+        // Form save changes submission
+        const saveBtn = document.getElementById('save-changes-btn');
+        saveBtn.addEventListener('click', () => {
+            showToast('Profile details updated successfully!');
+        });
+
+
+    </script>
+</body>
+</html>

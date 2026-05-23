@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadLens - Recent Complaints</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Top Header -->
+    <header class="top-header" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 24px; justify-content: flex-start;">
+        <a href="javascript:history.back()" class="nav-link back-btn" style="text-decoration: none; color: var(--text-dark); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <span class="icon">←</span> Back
+        </a>
+        <div class="logo" style="display: flex; align-items: center; gap: 12px;">
+          <div class="logo-icon" style="width: 28px; height: 28px; background: var(--primary-blue); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
+          <h2 style="font-size: 20px; font-weight: 700; color: var(--primary-blue); margin: 0;">RoadLens</h2>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search roads, contractors, issues...">
+      </div>
+      
+      <!-- Empty div to balance grid -->
+      <div></div>
+    </header>
+
+    <!-- Top Metric Boxes -->
+    <!-- AntiGravity Integration: Dynamic emergency alerts binding goes here -->
+    <div class="top-boxes single-header">
+      <!-- Emergency Alerts - Now full width -->
+      <div class="metric-card emergency-card full-width">
+        <div class="metric-header">
+          <div class="status-dot pulsing-red"></div>
+          <span class="metric-title">Active Emergency Alerts</span>
+        </div>
+        <div class="metric-value">3 <span class="trend critical-subtle">Critical Action Required</span></div>
+        <div class="metric-subtext">Flood Alert (1) • Accident Zone (1) • Pothole Hazard (1)</div>
+      </div>
+    </div>
+
+    <!-- Complaints List Area -->
+    <div class="content-section">
+      <div class="section-header">
+        <h3>Complaints Directory</h3>
+        
+        <!-- Filters -->
+        <div class="filters">
+          <div class="dropdown-filters">
+            <!-- AntiGravity Integration: Populate filter options dynamically -->
+            <select id="statusFilter" class="filter-select">
+              <option value="all">📋 All Statuses</option>
+              <option value="pending">⏳ Pending (42)</option>
+              <option value="ongoing">🚧 In Progress (18)</option>
+              <option value="completed">✅ Completed (320)</option>
+            </select>
+
+            <select id="locationFilter" class="filter-select">
+              <option value="all">📍 All Locations</option>
+              <option value="adyar">Adyar</option>
+              <option value="anna-nagar">Anna Nagar</option>
+              <option value="guindy">Guindy</option>
+              <option value="omr">OMR</option>
+              <option value="t-nagar">T. Nagar</option>
+              <option value="tambaram">Tambaram</option>
+              <option value="thiruvanmiyur">Thiruvanmiyur</option>
+              <option value="velachery">Velachery</option>
+            </select>
+
+            <select id="severityFilter" class="filter-select">
+              <option value="all">⚠ All Severities</option>
+              <option value="high">High Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="low">Low Priority</option>
+            </select>
+            
+            <select id="dateFilter" class="filter-select">
+              <option value="all">📅 All Time</option>
+              <option value="today">Today</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">This Month</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="complaints-list">
+        <!-- AntiGravity Integration: Render these items using standard component mapping -->
+        <!-- List Item: Pending -->
+        <div class="complaint-item" data-status="pending" data-location="omr" data-severity="high" data-date="3">
+          <div class="item-status pending-bg">⏳ Pending</div>
+          <div class="item-details">
+            <h4>Deep Pothole on Main St</h4>
+            <p>Location: OMR • Priority: High • Reported 3 days ago</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">Waiting for action</div>
+            <div class="issuer">Issued by <strong>Karthik R.</strong></div>
+          </div>
+        </div>
+
+        <!-- List Item: Ongoing -->
+        <div class="complaint-item" data-status="ongoing" data-location="velachery" data-severity="high" data-date="2">
+          <div class="item-status ongoing-bg">🚧 In Progress</div>
+          <div class="item-details">
+            <h4>Traffic Light Malfunction</h4>
+            <p>Location: Velachery • Priority: High • Est. Completion: 48 hrs</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">In Progress</div>
+            <div class="issuer">Issued by <strong>Priya S.</strong></div>
+          </div>
+        </div>
+
+        <!-- List Item: Completed -->
+        <div class="complaint-item" data-status="completed" data-location="anna-nagar" data-severity="low" data-date="0">
+          <div class="item-status completed-bg">✅ Completed</div>
+          <div class="item-details">
+            <h4>Streetlight Fixed - 4th Avenue</h4>
+            <p>Location: Anna Nagar • Priority: Low • Last resolved 2 hrs ago</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">Resolved</div>
+            <div class="issuer">Issued by <strong>Arun M.</strong></div>
+          </div>
+        </div>
+        
+        <!-- List Item: Pending -->
+        <div class="complaint-item" data-status="pending" data-location="tambaram" data-severity="medium" data-date="4">
+          <div class="item-status pending-bg">⏳ Pending</div>
+          <div class="item-details">
+            <h4>Broken Pavement near Park</h4>
+            <p>Location: Tambaram • Priority: Medium • Reported 4 days ago</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">Waiting for action</div>
+            <div class="issuer">Issued by <strong>Divya T.</strong></div>
+          </div>
+        </div>
+
+        <!-- List Item: Ongoing -->
+        <div class="complaint-item" data-status="ongoing" data-location="t-nagar" data-severity="medium" data-date="1">
+          <div class="item-status ongoing-bg">🚧 In Progress</div>
+          <div class="item-details">
+            <h4>Fallen Tree Branch</h4>
+            <p>Location: T. Nagar • Priority: Medium • Est. Completion: 12 hrs</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">In Progress</div>
+            <div class="issuer">Issued by <strong>Manoj V.</strong></div>
+          </div>
+        </div>
+
+        <!-- List Item: Pending -->
+        <div class="complaint-item" data-status="pending" data-location="adyar" data-severity="low" data-date="7">
+          <div class="item-status pending-bg">⏳ Pending</div>
+          <div class="item-details">
+            <h4>Faded Zebra Crossing</h4>
+            <p>Location: Adyar • Priority: Low • Reported 1 week ago</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">Waiting for action</div>
+            <div class="issuer">Issued by <strong>Sneha K.</strong></div>
+          </div>
+        </div>
+
+        <!-- List Item: Completed -->
+        <div class="complaint-item" data-status="completed" data-location="guindy" data-severity="high" data-date="1">
+          <div class="item-status completed-bg">✅ Completed</div>
+          <div class="item-details">
+            <h4>Open Manhole Covered</h4>
+            <p>Location: Guindy • Priority: High • Last resolved 1 day ago</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">Resolved</div>
+            <div class="issuer">Issued by <strong>Ramesh N.</strong></div>
+          </div>
+        </div>
+
+        <!-- List Item: Pending -->
+        <div class="complaint-item" data-status="pending" data-location="thiruvanmiyur" data-severity="high" data-date="0">
+          <div class="item-status pending-bg">⏳ Pending</div>
+          <div class="item-details">
+            <h4>Severe Waterlogging</h4>
+            <p>Location: Thiruvanmiyur • Priority: High • Reported 5 hrs ago</p>
+          </div>
+          <div class="item-meta">
+            <div class="meta-status">Waiting for action</div>
+            <div class="issuer">Issued by <strong>Anita R.</strong></div>
+          </div>
+        </div>
+
+        <div id="noRecordsMessage" style="display: none; text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px;">
+          No records found matching the selected filters.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
